@@ -185,7 +185,7 @@ def run_demo():
         {
             "speaker": "ATTENDEES",
             "text": "All right team, we need to finalize our database and caching tier before the v2 release. Are we sticking with Redis?",
-            "event": None,
+            "event": "rag_redis",
         },
         {
             "speaker": "YOU",
@@ -274,9 +274,14 @@ def run_demo():
             sig.audio_levels.emit(0.0, 0.0)
 
             # Fire synchronized AI events
-            if item["event"] == "rag_nudge":
+            if item["event"] == "rag_redis":
                 ctx = graph.get_entity_context("GraphQL Caching")
                 sig.nudge.emit(format_context_html(ctx), full_text)
+                time.sleep(0.9)
+            elif item["event"] == "rag_nudge":
+                ctx = graph.get_entity_context("GraphQL Caching")
+                sig.nudge.emit(format_context_html(ctx), full_text)
+                time.sleep(1.1)
             elif item["event"] == "decision":
                 sig.decision.emit({
                     "entity": "Kubernetes Ingress",
@@ -285,11 +290,24 @@ def run_demo():
                     "proposed_by": "Architecture Lead",
                     "agreed_by": "Team",
                 })
+                sig.nudge.emit(
+                    "<div style='color:#818CF8;font-weight:bold;'>Kubernetes Ingress</div>"
+                    "<div style='color:#10B981;font-weight:bold;'>• CURRENT TRUTH [ACTIVE]:</div>"
+                    "<div style='color:#ECEFF1;'>Deploy Kubernetes cluster with NGINX ingress controller hooked up to PostgreSQL.</div>",
+                    "Decision Logged: Kubernetes Ingress"
+                )
             elif item["event"] == "commitment":
                 sig.commitment.emit({
                     "assignee": "Devanshu",
                     "task": "Update the ADR documentation and sync with the DevOps team by tomorrow morning.",
                 })
+                sig.nudge.emit(
+                    "<div style='color:#818CF8;font-weight:bold;'>Action Item • @Devanshu</div>"
+                    "<div style='color:#10B981;font-weight:bold;'>• CURRENT TRUTH [ACTIVE]:</div>"
+                    "<div style='color:#ECEFF1;'>Export the meeting minutes and share the updated ADR with the infra squad.</div>",
+                    full_text
+                )
+                time.sleep(0.8)
 
             time.sleep(0.75)
 
