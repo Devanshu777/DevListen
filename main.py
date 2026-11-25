@@ -36,7 +36,7 @@ from vault.temporal_graph import TemporalDecisionGraph
 from vault.decision_extractor import DecisionExtractor
 from vault.commitment_extractor import CommitmentExtractor
 from vault.semantic_search import SemanticSearchEngine
-from ui.executive_sidecar import ExecutiveSidecar
+from ui.desktop_studio import DevListenStudio as ExecutiveSidecar
 from ui.system_tray import DevListenSystemTray
 from export.meeting_exporter import MeetingExporter
 

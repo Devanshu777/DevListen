@@ -25,7 +25,7 @@ from vault.temporal_graph import TemporalDecisionGraph
 from vault.decision_extractor import DecisionExtractor
 from vault.commitment_extractor import CommitmentExtractor
 from vault.semantic_search import SemanticSearchEngine
-from ui.executive_sidecar import ExecutiveSidecar
+from ui.desktop_studio import DevListenStudio
 from export.meeting_exporter import MeetingExporter
 
 def format_context_html(ctx: dict) -> str:
@@ -105,17 +105,10 @@ def run_demo():
         ctx = graph.get_entity_context(entity_name)
         return format_context_html(ctx)
 
-    # 2. Launch Sidecar HUD
-    sidecar = ExecutiveSidecar(on_query_callback=query_resolver)
-    if "--stealth" not in sys.argv:
-        # Allow OBS / Windows screen recorders to capture the HUD cleanly for LinkedIn demo video
-        sidecar.stealth_timer.stop()
-        try:
-            import ctypes
-            ctypes.windll.user32.SetWindowDisplayAffinity(int(sidecar.winId()), 0x0)
-        except Exception:
-            pass
-    sidecar.set_tier_badge("INT8 CPU", "Hardware: CPU Optimized • 100% Offline")
+    # 2. Launch Desktop Studio UI
+    sidecar = DevListenStudio(on_query_callback=query_resolver)
+    sidecar._apply_stealth("--stealth" in sys.argv)
+    sidecar.set_tier_badge("INT8 CPU • Ready", "Hardware: CPU Optimized • 100% Offline")
     sidecar.show()
 
     # 3. Timed Storyboard Sequence for Video Recording
