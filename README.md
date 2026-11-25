@@ -32,6 +32,8 @@ So I built **DevListen** from scratch to run **100% locally on CPU**—combining
 
 > **Try it on your phone or corporate laptop right now (no install required):**  
 > 👉 **[https://devanshu777.github.io/DevListen/](https://devanshu777.github.io/DevListen/)**
+>
+> [![DevListen v1.0 Desktop Studio — Click to Launch Interactive Demo](docs/demo_preview.png)](https://devanshu777.github.io/DevListen/)
 
 ---
 
