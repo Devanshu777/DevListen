@@ -1,32 +1,37 @@
 """
-DevListen — Flawless 1-Click Video Recording & Demo Runner.
-Simulates a live multi-speaker engineering sync with realistic pacing:
-1. Displays the stunning Granola/Raycast Obsidian Glass HUD.
-2. Streams real-time speech cards for [ATTENDEES] and [YOU].
-3. Fires an automatic Zero-Click Proactive Knowledge Nudge when an attendee asks a question.
-4. Auto-detects an architectural decision and records it in the Bi-Temporal Graph.
-5. Auto-detects an action item commitment and assigns it.
-6. Allows you to speak into your mic or let the script run automatically.
+DevListen — Voice-Synchronized 1-Click Video Recording & Demo Runner.
+Simulates a live multi-speaker engineering sync with realistic neural AI voices:
+1. Synthesizes distinct neural voices for [ATTENDEES] (en-US-AndrewNeural) & [YOU] (en-US-BrianNeural) via edge-tts.
+2. Plays audio natively on Windows (winmm MCI) in sync with live streaming word captions & waveform energy.
+3. Triggers Zero-Click Proactive RAG Nudge + Natural Suggested Response when a question is asked.
+4. Auto-extracts an architectural decision & action item into the Bi-Temporal Graph & Inspector.
 """
 import os
 import sys
-import time
 import uuid
+import time
+import ctypes
+import asyncio
 import threading
+import subprocess
 from PySide6.QtWidgets import QApplication
-from PySide6.QtCore import QTimer
+from PySide6.QtCore import QObject, Signal
 
-# Ensure paths
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
 from vault.database import VaultDatabase
-from vault.crypto import VaultCrypto
 from vault.temporal_graph import TemporalDecisionGraph
-from vault.decision_extractor import DecisionExtractor
-from vault.commitment_extractor import CommitmentExtractor
 from vault.semantic_search import SemanticSearchEngine
 from ui.desktop_studio import DevListenStudio
-from export.meeting_exporter import MeetingExporter
+
+
+class DemoSignaler(QObject):
+    stream_card = Signal(str, str, bool)
+    audio_levels = Signal(float, float)
+    nudge = Signal(str, str)
+    decision = Signal(dict)
+    commitment = Signal(dict)
+
 
 def format_context_html(ctx: dict) -> str:
     entity = ctx.get("entity", "Entity")
@@ -36,7 +41,7 @@ def format_context_html(ctx: dict) -> str:
     if not curr and not history:
         return f"<div style='color: #ECEFF1; font-size: 11px;'>No recorded decisions found for <b>{entity}</b>.</div>"
 
-    html = f"<div style='font-family: sans-serif; font-size: 11px;'>"
+    html = "<div style='font-family: sans-serif; font-size: 11px;'>"
     html += f"<div style='color: #818CF8; font-weight: bold; font-size: 12px; margin-bottom: 4px;'>{entity}</div>"
 
     if curr:
@@ -61,24 +66,66 @@ def format_context_html(ctx: dict) -> str:
     html += "</div>"
     return html
 
+
+def play_mp3_blocking(mp3_path: str):
+    """Plays an MP3 file cleanly using Windows winmm MCI without extra dependencies."""
+    winmm = ctypes.windll.winmm
+    alias = f"devlisten_demo_{int(time.time() * 1000)}"
+    winmm.mciSendStringW(f'open "{mp3_path}" type mpegvideo alias {alias}', None, 0, None)
+    winmm.mciSendStringW(f'play {alias} wait', None, 0, None)
+    winmm.mciSendStringW(f'close {alias}', None, 0, None)
+
+
+def speak_fallback_sapi(text: str):
+    """Offline fallback using built-in Windows System.Speech if edge-tts is unavailable."""
+    safe = text.replace("'", "''")
+    ps = (
+        "Add-Type -AssemblyName System.Speech; "
+        "$s = New-Object System.Speech.Synthesis.SpeechSynthesizer; "
+        f"$s.Speak('{safe}')"
+    )
+    subprocess.run(["powershell", "-NoProfile", "-Command", ps], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+
+
+def prepare_demo_audio(script: list, cache_dir: str) -> list:
+    """Pre-generates and caches neural AI voice MP3 clips via edge-tts."""
+    os.makedirs(cache_dir, exist_ok=True)
+    paths = []
+    try:
+        import edge_tts
+
+        async def _synth_all():
+            for idx, item in enumerate(script):
+                out_file = os.path.join(cache_dir, f"turn_{idx}.mp3")
+                if not os.path.exists(out_file) or os.path.getsize(out_file) < 512:
+                    voice = "en-US-BrianNeural" if item["speaker"] == "YOU" else "en-US-AndrewNeural"
+                    comm = edge_tts.Communicate(item["text"], voice)
+                    await comm.save(out_file)
+                paths.append(out_file)
+
+        asyncio.run(_synth_all())
+    except Exception as e:
+        print(f"[DevListen Demo] Neural TTS unavailable ({e}), using offline Windows Speech fallback.")
+        paths = [None] * len(script)
+    return paths
+
+
 def run_demo():
     app = QApplication(sys.argv)
 
-    # 1. Initialize Database & Seed Demo Knowledge
+    # 1. Initialize Vault & Pre-seed Bi-Temporal Knowledge Graph
     db = VaultDatabase()
     graph = TemporalDecisionGraph(db)
-    extractor = DecisionExtractor(graph)
-    commitment_extractor = CommitmentExtractor(db)
     semantic_engine = SemanticSearchEngine(db)
 
-    # Pre-seed historical context so the Zero-Click Nudge triggers flawlessly
     m_uuid = str(uuid.uuid4())
     with db.get_connection() as conn:
-        conn.execute("INSERT OR IGNORE INTO meetings (uuid, title, platform) VALUES (?, ?, ?)",
-                     (m_uuid, "Product & Architecture Review", "Teams"))
+        conn.execute(
+            "INSERT OR IGNORE INTO meetings (uuid, title, platform) VALUES (?, ?, ?)",
+            (m_uuid, "Product & Architecture Review", "Teams")
+        )
         conn.commit()
 
-    # Pre-seed: Prior decision on GraphQL Caching
     dec1 = graph.record_decision(
         entity_name="GraphQL Caching",
         summary="Use Redis for response caching across all endpoints.",
@@ -87,7 +134,6 @@ def run_demo():
         agreed_by="Team",
         meeting_uuid=m_uuid
     )
-    # Superseding decision: Current Truth
     dec2 = graph.record_decision(
         entity_name="GraphQL Caching",
         summary="Hold off on Redis until Schema v2 lands to avoid memory overhead.",
@@ -111,86 +157,113 @@ def run_demo():
     sidecar.set_tier_badge("INT8 CPU • Ready", "Hardware: CPU Optimized • 100% Offline")
     sidecar.show()
 
-    # 3. Timed Storyboard Sequence for Video Recording
-    timeline = [
-        # (delay_sec, function)
-        (2.0, lambda: sidecar.update_audio_levels(0.0, 0.45)),
-        (3.0, lambda: sidecar.add_or_update_stream_card(
-            "All right team, we need to finalize our database and caching tier before the v2 release date.",
-            "ATTENDEES",
-            False
-        )),
-        (5.0, lambda: sidecar.add_or_update_stream_card(
-            "All right team, we need to finalize our database and caching tier before the v2 release date. Are we sticking with Redis, or should we evaluate Memcached?",
-            "ATTENDEES",
-            True
-        )),
-        (6.5, lambda: sidecar.update_audio_levels(0.65, 0.0)),
-        (7.5, lambda: sidecar.add_or_update_stream_card(
-            "I thought we agreed to hold off on Redis",
-            "YOU",
-            False
-        )),
-        (9.0, lambda: sidecar.add_or_update_stream_card(
-            "I thought we agreed to hold off on Redis until Schema v2 lands to avoid unnecessary memory overhead.",
-            "YOU",
-            True
-        )),
-        (10.5, lambda: sidecar.update_audio_levels(0.0, 0.55)),
-        (11.5, lambda: sidecar.add_or_update_stream_card(
-            "Wait, what did we decide about the GraphQL caching strategy last month?",
-            "ATTENDEES",
-            True
-        )),
-        # Trigger Zero-Click Nudge automatically!
-        (13.0, lambda: sidecar.show_ambient_nudge(
-            format_context_html(graph.get_entity_context("GraphQL Caching")),
-            "Wait, what did we decide about the GraphQL caching strategy last month?"
-        )),
-        # Attendee proposes new architectural direction
-        (17.0, lambda: sidecar.add_or_update_stream_card(
-            "We deployed the Kubernetes cluster with an NGINX ingress controller and hooked it up with PostgreSQL and Redis.",
-            "ATTENDEES",
-            True
-        )),
-        # Extract Decision into Decisions Tab
-        (18.5, lambda: sidecar.add_decision_card({
-            "entity": "Kubernetes",
-            "status": "ACTIVE",
-            "summary": "Adopted Kubernetes with an NGINX ingress controller hooked up to PostgreSQL and Redis.",
-            "proposed_by": "Architecture Lead",
-            "agreed_by": "Team"
-        })),
-        # Action Item Assignment
-        (22.0, lambda: sidecar.add_or_update_stream_card(
-            "Good point. Sanchit, can you update the ADR documentation and ping the DevOps team by tomorrow morning?",
-            "ATTENDEES",
-            True
-        )),
-        (23.5, lambda: sidecar.add_commitment_card({
-            "assignee": "Sanchit",
-            "task": "Update the ADR documentation and ping the DevOps team by tomorrow morning."
-        })),
-        # Final User confirmation
-        (26.0, lambda: sidecar.add_or_update_stream_card(
-            "On it. I'll export the meeting minutes and sync with the infra squad.",
-            "YOU",
-            True
-        )),
-        (28.0, lambda: sidecar.update_audio_levels(0.0, 0.0)),
+    sig = DemoSignaler()
+    sig.stream_card.connect(sidecar.add_or_update_stream_card)
+    sig.audio_levels.connect(sidecar.update_audio_levels)
+    sig.nudge.connect(sidecar.show_ambient_nudge)
+    sig.decision.connect(sidecar.add_decision_card)
+    sig.commitment.connect(sidecar.add_commitment_card)
+
+    script = [
+        {
+            "speaker": "ATTENDEES",
+            "text": "All right team, we need to finalize our database and caching tier before the v2 release. Are we sticking with Redis?",
+            "event": None,
+        },
+        {
+            "speaker": "YOU",
+            "text": "I thought we agreed to hold off on Redis until Schema v2 lands to avoid unnecessary memory overhead.",
+            "event": None,
+        },
+        {
+            "speaker": "ATTENDEES",
+            "text": "Wait, what did we decide about the GraphQL caching strategy last month?",
+            "event": "rag_nudge",
+        },
+        {
+            "speaker": "ATTENDEES",
+            "text": "Got it, makes total sense. Let's deploy the Kubernetes cluster with an NGINX ingress controller hooked up to PostgreSQL.",
+            "event": "decision",
+        },
+        {
+            "speaker": "ATTENDEES",
+            "text": "Sanchit, can you update the ADR documentation and sync with the DevOps team by tomorrow morning?",
+            "event": "commitment",
+        },
+        {
+            "speaker": "YOU",
+            "text": "On it. I'll export the meeting minutes and share the updated ADR with the infra squad.",
+            "event": None,
+        },
     ]
 
-    for delay, fn in timeline:
-        QTimer.singleShot(int(delay * 1000), fn)
+    cache_dir = os.path.join(os.getenv("LOCALAPPDATA", os.path.expanduser("~")), "DevListen", "demo_voices")
+
+    def orchestrate():
+        print("[DevListen Demo] Preparing neural AI voices...")
+        audio_paths = prepare_demo_audio(script, cache_dir)
+        time.sleep(1.0)
+
+        for item, mp3 in zip(script, audio_paths):
+            spk = item["speaker"]
+            full_text = item["text"]
+            words = full_text.split()
+
+            # Start audio playback on a worker thread so captions stream while voice speaks
+            if mp3 and os.path.exists(mp3):
+                play_t = threading.Thread(target=play_mp3_blocking, args=(mp3,), daemon=True)
+            else:
+                play_t = threading.Thread(target=speak_fallback_sapi, args=(full_text,), daemon=True)
+            play_t.start()
+
+            # Animate waveform & stream partial caption words smoothly
+            step = max(2, len(words) // 5)
+            for i in range(step, len(words), step):
+                if not play_t.is_alive():
+                    break
+                if spk == "YOU":
+                    sig.audio_levels.emit(0.75, 0.0)
+                else:
+                    sig.audio_levels.emit(0.0, 0.72)
+                sig.stream_card.emit(" ".join(words[:i]) + "...", spk, False)
+                time.sleep(0.55)
+
+            play_t.join()
+            sig.stream_card.emit(full_text, spk, True)
+            sig.audio_levels.emit(0.0, 0.0)
+
+            # Fire synchronized AI events
+            if item["event"] == "rag_nudge":
+                ctx = graph.get_entity_context("GraphQL Caching")
+                sig.nudge.emit(format_context_html(ctx), full_text)
+            elif item["event"] == "decision":
+                sig.decision.emit({
+                    "entity": "Kubernetes Ingress",
+                    "status": "ACTIVE",
+                    "summary": "Deployed Kubernetes cluster with NGINX ingress controller hooked up to PostgreSQL.",
+                    "proposed_by": "Architecture Lead",
+                    "agreed_by": "Team",
+                })
+            elif item["event"] == "commitment":
+                sig.commitment.emit({
+                    "assignee": "Sanchit",
+                    "task": "Update the ADR documentation and sync with the DevOps team by tomorrow morning.",
+                })
+
+            time.sleep(0.75)
+
+        print("[DevListen Demo] Simulation complete!")
+
+    threading.Thread(target=orchestrate, daemon=True, name="DevListen-DemoVoice").start()
 
     print("==================================================")
-    print("DevListen Demo Runner Active 🎥")
-    print("• Perfect for OBS Screen Recording!")
-    print("• Timed realistic simulation running on screen...")
-    print("• Decisions, Action Items & Zero-Click Nudge will trigger automatically.")
+    print("DevListen Voice-Synchronized Demo Active")
+    print("• Neural AI Voices: ATTENDEES + YOU")
+    print("• Live Waveform, Streaming Captions & RAG Nudge")
     print("==================================================")
 
     sys.exit(app.exec())
+
 
 if __name__ == "__main__":
     run_demo()
