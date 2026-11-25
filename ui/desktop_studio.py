@@ -29,7 +29,7 @@ from PySide6.QtCore import (
 )
 from PySide6.QtGui import (
     QWheelEvent, QPixmap, QIcon, QPainter, QLinearGradient, QColor, QBrush,
-    QPainterPath, QPen
+    QPainterPath, QPen, QFont
 )
 
 user32 = ctypes.windll.user32
@@ -263,6 +263,8 @@ class DevListenStudio(QWidget):
         root = QVBoxLayout(self)
         root.setContentsMargins(6, 6, 6, 6)
 
+        self.setFont(QFont("Inter", 10))
+
         # Outer Obsidian Window Shell
         self.shell = QFrame(self)
         self.shell.setObjectName("shell")
@@ -271,6 +273,10 @@ class DevListenStudio(QWidget):
                 background-color: #09090B;
                 border: 1px solid rgba(255, 255, 255, 0.10);
                 border-radius: 14px;
+                font-family: 'Inter', 'Segoe UI Variable Text', 'Segoe UI', sans-serif;
+            }
+            QLabel, QPushButton, QLineEdit, QComboBox {
+                font-family: 'Inter', 'Segoe UI Variable Text', 'Segoe UI', sans-serif;
             }
         """)
         shell_layout = QVBoxLayout(self.shell)
@@ -655,7 +661,7 @@ class DevListenStudio(QWidget):
                 border: 1px solid rgba(6, 182, 212, 0.22);
                 border-radius: 9px;
                 padding: 10px;
-                font-family: 'Segoe UI Variable Text', 'Inter', sans-serif;
+                font-family: 'Inter', 'Segoe UI Variable Text', 'Segoe UI', sans-serif;
                 font-size: 12px;
                 line-height: 1.5;
             }
