@@ -169,13 +169,13 @@ class DevListenStudio(QWidget):
                 self.stealth_pill.setText("● Screen-Share Invisible")
                 self.stealth_pill.setStyleSheet(
                     "background: rgba(6, 182, 212, 0.12); color: #22D3EE; border: 1px solid rgba(6, 182, 212, 0.28);"
-                    "border-radius: 6px; padding: 3px 10px; font-size: 10.5px; font-weight: 600;"
+                    "border-radius: 6px; padding: 0px 12px; font-size: 11px; font-weight: 600;"
                 )
             else:
                 self.stealth_pill.setText("○ Recordable Mode")
                 self.stealth_pill.setStyleSheet(
                     "background: rgba(245, 158, 11, 0.12); color: #FBBF24; border: 1px solid rgba(245, 158, 11, 0.28);"
-                    "border-radius: 6px; padding: 3px 10px; font-size: 10.5px; font-weight: 600;"
+                    "border-radius: 6px; padding: 0px 12px; font-size: 11px; font-weight: 600;"
                 )
 
     def toggle_stealth(self):
@@ -301,7 +301,7 @@ class DevListenStudio(QWidget):
         nav_style = """
             QPushButton {
                 text-align: left;
-                padding: 9px 12px;
+                padding: 0px 12px;
                 border-radius: 8px;
                 color: #A1A1AA;
                 font-size: 12.5px;
@@ -311,20 +311,21 @@ class DevListenStudio(QWidget):
             }
             QPushButton:hover {
                 color: #F4F4F5;
-                background: rgba(255, 255, 255, 0.04);
+                background: rgba(255, 255, 255, 0.045);
             }
             QPushButton:checked {
                 color: #FFFFFF;
                 font-weight: 600;
                 background: qlineargradient(x1:0, y1:0, x2:1, y2:0, stop:0 rgba(6,182,212,0.16), stop:1 rgba(99,102,241,0.08));
-                border: 1px solid rgba(6, 182, 212, 0.30);
+                border: 1px solid rgba(6, 182, 212, 0.32);
             }
         """
 
         for label, svg, idx in nav_items:
             btn = QPushButton(f"  {label}", sidebar)
-            btn.setIcon(make_svg_icon(svg, "#06B6D4" if idx == 0 else "#71717A", 15))
-            btn.setIconSize(QSize(15, 15))
+            btn.setFixedHeight(38)
+            btn.setIcon(make_svg_icon(svg, "#06B6D4" if idx == 0 else "#71717A", 16))
+            btn.setIconSize(QSize(16, 16))
             btn.setCheckable(True)
             btn.setChecked(idx == 0)
             btn.setCursor(Qt.CursorShape.PointingHandCursor)
@@ -378,20 +379,23 @@ class DevListenStudio(QWidget):
         tlay.addStretch()
 
         dev_pill = QLabel("🎙️ System Audio + Mic (16kHz)", topbar)
+        dev_pill.setFixedHeight(28)
         dev_pill.setStyleSheet(
             "background: #111115; color: #D4D4D8; border: 1px solid rgba(255,255,255,0.08);"
-            "border-radius: 6px; padding: 3px 10px; font-size: 10.5px;"
+            "border-radius: 6px; padding: 0px 11px; font-size: 11px;"
         )
         tlay.addWidget(dev_pill)
 
         self.tier_pill = QLabel("⚡ INT8 CPU • Ready", topbar)
+        self.tier_pill.setFixedHeight(28)
         self.tier_pill.setStyleSheet(
             "background: rgba(99, 102, 241, 0.14); color: #A5B4FC; border: 1px solid rgba(99, 102, 241, 0.30);"
-            "border-radius: 6px; padding: 3px 10px; font-size: 10.5px; font-weight: 600;"
+            "border-radius: 6px; padding: 0px 11px; font-size: 11px; font-weight: 600;"
         )
         tlay.addWidget(self.tier_pill)
 
         self.stealth_pill = QPushButton("● Screen-Share Invisible", topbar)
+        self.stealth_pill.setFixedHeight(28)
         self.stealth_pill.setCursor(Qt.CursorShape.PointingHandCursor)
         self.stealth_pill.setToolTip("Click to toggle Win32 WDA_EXCLUDEFROMCAPTURE")
         self.stealth_pill.clicked.connect(self.toggle_stealth)
@@ -544,28 +548,33 @@ class DevListenStudio(QWidget):
 
         # Action Buttons Row
         btn_row = QHBoxLayout()
+        btn_row.setSpacing(8)
         btn_style = """
             QPushButton {
-                background: rgba(255,255,255,0.04); color: #D4D4D8;
-                border: 1px solid rgba(255,255,255,0.09); border-radius: 7px;
-                padding: 6px 10px; font-size: 11px; font-weight: 600;
+                background: rgba(255,255,255,0.045); color: #E4E4E7;
+                border: 1px solid rgba(255,255,255,0.10); border-radius: 7px;
+                padding: 0px 12px; font-size: 11px; font-weight: 600;
             }
-            QPushButton:hover { background: rgba(255,255,255,0.09); color: #FFFFFF; }
+            QPushButton:hover { background: rgba(255,255,255,0.10); color: #FFFFFF; border: 1px solid rgba(255,255,255,0.18); }
         """
         self.btn_toggle_json = QPushButton(" Raw JSON", right_panel)
-        self.btn_toggle_json.setIcon(make_svg_icon(SVG_CODE, "#06B6D4", 13))
+        self.btn_toggle_json.setFixedHeight(32)
+        self.btn_toggle_json.setIcon(make_svg_icon(SVG_CODE, "#06B6D4", 14))
+        self.btn_toggle_json.setIconSize(QSize(14, 14))
         self.btn_toggle_json.setCursor(Qt.CursorShape.PointingHandCursor)
         self.btn_toggle_json.setStyleSheet(btn_style)
         self.btn_toggle_json.clicked.connect(self._toggle_json_box)
 
         self.btn_export_md = QPushButton(" Export MD", right_panel)
-        self.btn_export_md.setIcon(make_svg_icon(SVG_EXPORT, "#A855F7", 13))
+        self.btn_export_md.setFixedHeight(32)
+        self.btn_export_md.setIcon(make_svg_icon(SVG_EXPORT, "#A855F7", 14))
+        self.btn_export_md.setIconSize(QSize(14, 14))
         self.btn_export_md.setCursor(Qt.CursorShape.PointingHandCursor)
         self.btn_export_md.setStyleSheet(btn_style)
         self.btn_export_md.clicked.connect(self.export_requested.emit)
 
-        btn_row.addWidget(self.btn_toggle_json)
-        btn_row.addWidget(self.btn_export_md)
+        btn_row.addWidget(self.btn_toggle_json, 1)
+        btn_row.addWidget(self.btn_export_md, 1)
         rlay.addLayout(btn_row)
 
         # Embedded JSON Code Inspector
@@ -637,8 +646,10 @@ class DevListenStudio(QWidget):
         lbl.setAlignment(Qt.AlignmentFlag.AlignCenter)
         lbl.setStyleSheet("color: #D4D4D8; font-size: 12.5px; border: none;")
         btn = QPushButton("Browse Local Audio File...", drop_card)
+        btn.setFixedHeight(36)
+        btn.setMinimumWidth(200)
         btn.setCursor(Qt.CursorShape.PointingHandCursor)
-        btn.setStyleSheet("QPushButton { background: rgba(6,182,212,0.15); color: #22D3EE; border: 1px solid rgba(6,182,212,0.35); border-radius: 7px; padding: 7px 14px; font-weight: 600; }")
+        btn.setStyleSheet("QPushButton { background: rgba(6,182,212,0.15); color: #22D3EE; border: 1px solid rgba(6,182,212,0.35); border-radius: 8px; padding: 0px 18px; font-size: 12px; font-weight: 600; } QPushButton:hover { background: rgba(6,182,212,0.24); }")
         btn.clicked.connect(lambda: QFileDialog.getOpenFileName(self, "Select Audio File", "", "Audio (*.wav *.mp3 *.m4a)"))
         dl.addWidget(lbl)
         dl.addSpacing(8)
