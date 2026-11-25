@@ -438,6 +438,30 @@
     </div>
     </div><!-- end meeting-stage -->
 
+    <!-- The Problem & Why DevListen Exists -->
+    <div class="section" id="problem">
+      <h2 class="section-title">Why DevListen? The Problem It Solves</h2>
+      <p class="section-sub">Existing cloud meeting bots leak confidential audio, clutter calls, and retrieve outdated decisions. DevListen fixes all four at the edge.</p>
+      <div class="arch-grid">
+        <div class="arch-card">
+          <h3>🧠 Decision Drift &amp; Stale RAG</h3>
+          <p><strong>Problem:</strong> Flat vector RAG surfaces deprecated decisions alongside current ones.<br><strong>Solution:</strong> A <strong>Bi-Temporal Knowledge Graph</strong> (<code>ACTIVE</code> vs <code>SUPERSEDED</code>) that drafts natural spoken replies grounded only in current truth.</p>
+        </div>
+        <div class="arch-card">
+          <h3>🔒 Enterprise NDA &amp; Cloud Leaks</h3>
+          <p><strong>Problem:</strong> Cloud SaaS bots send sensitive engineering &amp; client audio to external servers.<br><strong>Solution:</strong> <strong>100% Offline Edge AI</strong> (INT8 Whisper + ONNX RAG + DPAPI/AES-256-GCM) with zero bytes leaving your laptop.</p>
+        </div>
+        <div class="arch-card">
+          <h3>👻 Intrusive Bots &amp; Screen-Share Exposure</h3>
+          <p><strong>Problem:</strong> Meeting bots interrupt calls, and normal overlays show up on screen shares.<br><strong>Solution:</strong> Passive OS-level capture (<strong>zero bots</strong>) + Win32 <code>WDA_EXCLUDEFROMCAPTURE</code> hardware invisibility.</p>
+        </div>
+        <div class="arch-card">
+          <h3>⚡ Fast-Speech Word Clipping</h3>
+          <p><strong>Problem:</strong> Naive local STT hard-chops buffers and drops rapid syllables.<br><strong>Solution:</strong> <strong>400ms acoustic boundary overlap</strong> + N-gram deduplication preserves every word on CPU.</p>
+        </div>
+      </div>
+    </div>
+
     <!-- Layer-by-Layer Architecture Flow -->
     <div class="section" id="architecture">
       <h2 class="section-title">Layered System Architecture &amp; Data Flow</h2>

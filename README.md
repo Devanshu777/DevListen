@@ -12,6 +12,21 @@ Try the interactive HUD, **Bi-Temporal Decision Graph**, and **Local Vector RAG*
 
 ---
 
+### 🎯 Why DevListen? The Problem We Are Solving
+
+Engineering teams lose critical context every week inside Zoom, Teams, and Webex calls—and existing AI meeting tools fail them in four fundamental ways:
+
+1. **Architectural Amnesia & "Decision Drift":** Teams verbally decide *"Hold off on Redis until Schema v2 lands"*, then two weeks later nobody remembers why or whether an older decision is still valid. **Flat Vector RAG makes this worse** by retrieving both the deprecated decision and the current one.  
+   → **DevListen solves this** with a **Bi-Temporal Knowledge Graph** (`ACTIVE` vs `SUPERSEDED` lineage) that surfaces *current* truth and drafts a ready-to-speak response **zero-click** the moment a question is asked.
+2. **Enterprise Privacy & NDA Walls:** Streaming confidential architecture reviews, client calls, or security triage to third-party cloud SaaS APIs violates NDA/SOC2/GDPR policies.  
+   → **DevListen solves this** by running **100% offline on your CPU** (`faster-whisper` INT8 + `BGE-Small` ONNX + DPAPI/AES-256-GCM encrypted SQLite WAL). Zero bytes ever leave your machine.
+3. **Intrusive Meeting Bots & Screen-Share Leaks:** Cloud notetakers drop an awkward *"AI Bot has joined the call"* into meetings, and standard overlays get exposed when you share your screen.  
+   → **DevListen solves this** by capturing OS audio passively (`WASAPI Loopback` + `Mic`) with **zero bots in the call**, and using Win32 `WDA_EXCLUDEFROMCAPTURE` so your copilot stays **100% invisible on screen shares**.
+4. **Fast-Speech Word Loss in Naive Local STT:** Out-of-the-box local Whisper pipelines hard-chop audio at fixed 2-second intervals and clip rapid syllables with aggressive VAD.  
+   → **DevListen solves this** using a **400ms acoustic boundary overlap** + N-gram deduplication pipeline so fast speakers never lose words.
+
+---
+
 ### 🏗️ Layered System Architecture (5 Decoupled Layers)
 
 ```mermaid
