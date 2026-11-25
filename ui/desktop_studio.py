@@ -9,13 +9,14 @@ Features:
 - 24px Bottom Telemetry Status Bar & optional WDA_EXCLUDEFROMCAPTURE Screen-Share Stealth.
 """
 import os
+import re
 import json
 import math
 import time
 import ctypes
 import random
 import datetime
-from typing import Callable, Optional, Dict, Any, List
+from typing import Callable, Optional, Dict, Any, List, Tuple
 
 from PySide6.QtWidgets import (
     QWidget, QVBoxLayout, QHBoxLayout, QLabel, QLineEdit, QPushButton,
@@ -27,7 +28,8 @@ from PySide6.QtCore import (
     QPropertyAnimation, QEasingCurve
 )
 from PySide6.QtGui import (
-    QWheelEvent, QPixmap, QIcon, QPainter, QLinearGradient, QColor, QBrush
+    QWheelEvent, QPixmap, QIcon, QPainter, QLinearGradient, QColor, QBrush,
+    QPainterPath, QPen
 )
 
 user32 = ctypes.windll.user32
@@ -44,6 +46,60 @@ def make_svg_icon(svg_body: str, color: str = "#94A3B8", size: int = 15) -> QIco
     pixmap = QPixmap()
     pixmap.loadFromData(svg_str.encode("utf-8"), "SVG")
     return QIcon(pixmap)
+
+
+def load_local_profile_avatar(size: int = 36) -> Tuple[QPixmap, str]:
+    """
+    Loads user's local profile photo from outside the repository (%LOCALAPPDATA%/DevListen/profile.jpg).
+    Never stores personal images in source control; falls back to a neutral avatar for repo cloners.
+    """
+    local_dir = os.path.join(os.getenv("LOCALAPPDATA", os.path.expanduser("~")), "DevListen")
+    candidates = [
+        os.getenv("DEVLISTEN_AVATAR", ""),
+        os.path.join(local_dir, "profile.jpg"),
+        os.path.join(local_dir, "profile.png"),
+    ]
+    img_path = next((p for p in candidates if p and os.path.isfile(p)), None)
+
+    out = QPixmap(size, size)
+    out.fill(Qt.GlobalColor.transparent)
+    painter = QPainter(out)
+    painter.setRenderHint(QPainter.RenderHint.Antialiasing)
+    painter.setRenderHint(QPainter.RenderHint.SmoothPixmapTransform)
+
+    clip = QPainterPath()
+    clip.addEllipse(1, 1, size - 2, size - 2)
+    painter.setClipPath(clip)
+
+    if img_path:
+        src = QPixmap(img_path)
+        if not src.isNull():
+            side = min(src.width(), src.height())
+            x = (src.width() - side) // 2
+            y = max(0, (src.height() - side) // 4)
+            cropped = src.copy(x, y, side, side).scaled(
+                size, size, Qt.AspectRatioMode.KeepAspectRatioByExpanding, Qt.TransformationMode.SmoothTransformation
+            )
+            painter.drawPixmap(0, 0, cropped)
+            painter.setClipping(False)
+            painter.setPen(QPen(QColor("#06B6D4"), 1.5))
+            painter.drawEllipse(1, 1, size - 2, size - 2)
+            painter.end()
+            return out, os.getenv("DEVLISTEN_USER_NAME", "Devanshu")
+
+    # Neutral fallback for anyone cloning the public repo
+    painter.fillRect(0, 0, size, size, QColor("#18181B"))
+    painter.setClipping(False)
+    painter.setPen(QPen(QColor("#3F3F46"), 1.5))
+    painter.drawEllipse(1, 1, size - 2, size - 2)
+    painter.setPen(QColor("#22D3EE"))
+    f = painter.font()
+    f.setBold(True)
+    f.setPointSize(11)
+    painter.setFont(f)
+    painter.drawText(out.rect(), Qt.AlignmentFlag.AlignCenter, "U")
+    painter.end()
+    return out, "Local User"
 
 
 def animate_fade_in(widget: QWidget, duration_ms: int = 220):
@@ -151,7 +207,7 @@ class DevListenStudio(QWidget):
         self._decisions_list: List[Dict[str, Any]] = []
         self._commitments_list: List[Dict[str, Any]] = []
         self._transcript_log: List[Dict[str, Any]] = []
-        self._show_raw_json = True
+        self._show_raw_json = False
 
         self._init_ui()
         self._apply_stealth(True)
@@ -336,26 +392,38 @@ class DevListenStudio(QWidget):
 
         lay.addStretch()
 
-        # Bottom Privacy Vault Badge
-        vault_card = QFrame(sidebar)
-        vault_card.setStyleSheet("""
+        # Bottom Local Profile Card (Avatar loaded from %LOCALAPPDATA%/DevListen outside repo)
+        profile_card = QFrame(sidebar)
+        profile_card.setStyleSheet("""
             QFrame {
                 background: rgba(255, 255, 255, 0.03);
                 border: 1px solid rgba(255, 255, 255, 0.07);
-                border-radius: 8px;
-                padding: 6px;
+                border-radius: 10px;
             }
         """)
-        vlay = QHBoxLayout(vault_card)
-        vlay.setContentsMargins(8, 6, 8, 6)
-        v_icon = QLabel(vault_card)
-        v_icon.setPixmap(make_svg_icon(SVG_SHIELD, "#10B981", 14).pixmap(14, 14))
-        v_icon.setStyleSheet("border: none;")
-        v_txt = QLabel("Zero-Trust Vault\nDPAPI + AES-256", vault_card)
-        v_txt.setStyleSheet("color: #A1A1AA; font-size: 10px; border: none;")
-        vlay.addWidget(v_icon)
-        vlay.addWidget(v_txt)
-        lay.addWidget(vault_card)
+        play = QHBoxLayout(profile_card)
+        play.setContentsMargins(10, 8, 10, 8)
+        play.setSpacing(10)
+
+        avatar_pix, user_name = load_local_profile_avatar(36)
+        avatar_lbl = QLabel(profile_card)
+        avatar_lbl.setFixedSize(36, 36)
+        avatar_lbl.setPixmap(avatar_pix)
+        avatar_lbl.setStyleSheet("border: none; background: transparent;")
+
+        info_col = QVBoxLayout()
+        info_col.setSpacing(1)
+        name_lbl = QLabel(user_name, profile_card)
+        name_lbl.setStyleSheet("color: #FAFAFA; font-size: 12px; font-weight: 700; border: none;")
+        sub_lbl = QLabel("🔒 Zero-Trust Vault", profile_card)
+        sub_lbl.setStyleSheet("color: #10B981; font-size: 9.5px; font-weight: 500; border: none;")
+        info_col.addWidget(name_lbl)
+        info_col.addWidget(sub_lbl)
+
+        play.addWidget(avatar_lbl)
+        play.addLayout(info_col)
+        play.addStretch()
+        lay.addWidget(profile_card)
 
         return sidebar
 
@@ -528,7 +596,7 @@ class DevListenStudio(QWidget):
         rlay.setContentsMargins(14, 14, 14, 14)
         rlay.setSpacing(10)
 
-        r_hdr = QLabel("AI Insights & JSON", right_panel)
+        r_hdr = QLabel("AI Copilot & Suggested Reply", right_panel)
         r_hdr.setStyleSheet("color: #FAFAFA; font-size: 13px; font-weight: 700; border: none;")
         rlay.addWidget(r_hdr)
 
@@ -577,9 +645,34 @@ class DevListenStudio(QWidget):
         btn_row.addWidget(self.btn_export_md, 1)
         rlay.addLayout(btn_row)
 
-        # Embedded JSON Code Inspector
+        # Primary Default View: Suggested Response Based on Historical Context
+        self.suggestion_box = QTextEdit(right_panel)
+        self.suggestion_box.setReadOnly(True)
+        self.suggestion_box.setStyleSheet("""
+            QTextEdit {
+                background-color: #09090D;
+                color: #F4F4F5;
+                border: 1px solid rgba(6, 182, 212, 0.22);
+                border-radius: 9px;
+                padding: 10px;
+                font-family: 'Segoe UI Variable Text', 'Inter', sans-serif;
+                font-size: 12px;
+                line-height: 1.5;
+            }
+        """)
+        self.suggestion_box.setHtml(
+            "<div style='color:#22D3EE; font-weight:700; font-size:11px; margin-bottom:6px;'>"
+            "💬 SUGGESTED RESPONSE (HISTORICAL RAG)</div>"
+            "<div style='color:#A1A1AA; font-size:11.5px;'>"
+            "When an attendee asks a question, DevListen searches your Bi-Temporal Knowledge Graph "
+            "and drafts a ready-to-speak response here based on past decisions.</div>"
+        )
+        rlay.addWidget(self.suggestion_box, 1)
+
+        # Secondary Toggle View: Raw JSON Code Inspector (Hidden by default)
         self.json_box = QTextEdit(right_panel)
         self.json_box.setReadOnly(True)
+        self.json_box.setVisible(False)
         self.json_box.setStyleSheet("""
             QTextEdit {
                 background-color: #09090D;
@@ -823,6 +916,8 @@ class DevListenStudio(QWidget):
     def _toggle_json_box(self):
         self._show_raw_json = not self._show_raw_json
         self.json_box.setVisible(self._show_raw_json)
+        self.suggestion_box.setVisible(not self._show_raw_json)
+        self.btn_toggle_json.setText(" Suggested Reply" if self._show_raw_json else " Raw JSON")
 
     def _refresh_insights_and_json(self):
         last_entry = self._transcript_log[-1] if self._transcript_log else {"speaker": "SYSTEM", "text": "Listening..."}
@@ -958,6 +1053,20 @@ class DevListenStudio(QWidget):
         self.nudge_frame.setVisible(True)
         animate_fade_in(self.nudge_frame, duration_ms=220)
         QTimer.singleShot(11000, lambda: self.nudge_frame.setVisible(False))
+
+        # Populate the Right-Hand Suggested Response Box from historical RAG context
+        plain = re.sub(r'<[^>]+>', ' ', html_content)
+        plain = re.sub(r'\s+', ' ', plain).strip()
+        self.suggestion_box.setHtml(
+            f"<div style='color:#22D3EE; font-weight:700; font-size:11px; margin-bottom:6px;'>"
+            f"💬 SUGGESTED RESPONSE</div>"
+            f"<div style='color:#A1A1AA; font-size:10.5px; margin-bottom:8px;'>"
+            f"<b>Asked:</b> \"{trimmed}\"</div>"
+            f"<div style='color:#F4F4F5; font-size:12px; background:rgba(6,182,212,0.08); "
+            f"border-left:3px solid #06B6D4; padding:8px; border-radius:4px; margin-bottom:8px;'>"
+            f"\"Based on our recorded meeting history: {plain}\"</div>"
+            f"<div style='color:#71717A; font-size:10px;'>Grounded by Bi-Temporal Knowledge Graph (100% Offline)</div>"
+        )
 
     def _handle_search(self):
         text = self.search_input.text().strip()
