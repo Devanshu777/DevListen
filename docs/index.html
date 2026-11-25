@@ -3,503 +3,365 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>DevListen — 100% Offline Edge AI Meeting Copilot & Bi-Temporal Knowledge Graph</title>
+  <title>DevListen v1.0 — 100% Offline Edge AI Meeting Copilot &amp; Bi-Temporal Knowledge Graph</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
   <style>
     :root {
-      --bg: #07080c;
-      --surface: rgba(15, 17, 24, 0.96);
-      --surface-light: rgba(255, 255, 255, 0.035);
+      --bg: #09090b;
+      --surface: #111115;
+      --sidebar: #0c0c10;
       --border: rgba(255, 255, 255, 0.08);
-      --text: #f8fafc;
-      --muted: #94a3b8;
-      --dim: #64748b;
+      --text: #fafafa;
+      --muted: #a1a1aa;
+      --dim: #71717a;
+      --cyan: #06b6d4;
+      --indigo: #6366f1;
+      --purple: #a855f7;
       --emerald: #10b981;
-      --iris: #818cf8;
       --amber: #f59e0b;
       --rose: #f43f5e;
-      --sky: #38bdf8;
     }
     * { box-sizing: border-box; margin: 0; padding: 0; }
     body {
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI Variable Text", "Inter", sans-serif;
-      background: radial-gradient(circle at 15% 10%, rgba(129, 140, 248, 0.12), transparent 40%),
-                  radial-gradient(circle at 85% 20%, rgba(16, 185, 129, 0.09), transparent 35%),
-                  var(--bg);
+      font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI Variable Text", sans-serif;
+      background:
+        radial-gradient(circle at 18% 8%, rgba(6, 182, 212, 0.12), transparent 38%),
+        radial-gradient(circle at 82% 14%, rgba(99, 102, 241, 0.12), transparent 38%),
+        var(--bg);
       color: var(--text);
       line-height: 1.55;
       min-height: 100vh;
     }
-    .container {
-      max-width: 1180px;
-      margin: 0 auto;
-      padding: 28px 20px 64px;
-    }
+    .container { max-width: 1220px; margin: 0 auto; padding: 28px 20px 72px; }
+
     /* Hero */
-    .hero {
-      display: grid;
-      grid-template-columns: 1.05fr 0.95fr;
-      gap: 36px;
-      align-items: start;
-    }
-    @media (max-width: 920px) {
-      .hero { grid-template-columns: 1fr; }
-    }
+    .hero-top { text-align: center; max-width: 820px; margin: 0 auto 28px; }
     .eyebrow {
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      font-size: 12px;
-      font-weight: 600;
-      color: var(--emerald);
-      background: rgba(16, 185, 129, 0.1);
-      border: 1px solid rgba(16, 185, 129, 0.25);
-      padding: 5px 12px;
-      border-radius: 999px;
-      margin-bottom: 16px;
+      display: inline-flex; align-items: center; gap: 8px;
+      font-size: 12px; font-weight: 600; color: #22d3ee;
+      background: rgba(6, 182, 212, 0.10); border: 1px solid rgba(6, 182, 212, 0.28);
+      padding: 5px 13px; border-radius: 999px; margin-bottom: 14px;
     }
     .dot-pulse {
       width: 7px; height: 7px; border-radius: 50%; background: var(--emerald);
-      box-shadow: 0 0 8px var(--emerald);
-      animation: pulse 1.8s infinite;
+      box-shadow: 0 0 8px var(--emerald); animation: pulse 1.8s infinite;
     }
     @keyframes pulse { 0%,100% { opacity: 1; } 50% { opacity: 0.35; } }
     h1 {
-      font-size: clamp(28px, 4vw, 44px);
-      font-weight: 800;
-      letter-spacing: -0.03em;
-      line-height: 1.12;
-      margin-bottom: 16px;
-      background: linear-gradient(135deg, #ffffff 30%, #94a3b8 100%);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
+      font-size: clamp(28px, 4vw, 44px); font-weight: 800; letter-spacing: -0.03em; line-height: 1.12;
+      margin-bottom: 12px;
+      background: linear-gradient(135deg, #ffffff 35%, #a1a1aa 100%);
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
     }
-    .subtitle {
-      color: var(--muted);
-      font-size: 15.5px;
-      margin-bottom: 22px;
-      max-width: 560px;
-    }
-    .badge-row {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 8px;
-      margin-bottom: 24px;
-    }
+    .subtitle { color: var(--muted); font-size: 15.5px; margin-bottom: 18px; }
+    .badge-row { display: flex; flex-wrap: wrap; justify-content: center; gap: 7px; margin-bottom: 20px; }
     .tech-badge {
-      font-size: 11px;
-      font-weight: 600;
-      color: #cbd5e1;
-      background: rgba(255,255,255,0.045);
-      border: 1px solid var(--border);
-      padding: 4px 10px;
-      border-radius: 6px;
+      font-size: 11px; font-weight: 600; color: #d4d4d8;
+      background: rgba(255,255,255,0.04); border: 1px solid var(--border);
+      padding: 4px 10px; border-radius: 6px;
     }
-    .cta-row {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 12px;
-      margin-bottom: 28px;
-    }
+    .cta-row { display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; margin-bottom: 10px; }
     .btn-primary {
-      background: linear-gradient(135deg, #10b981, #059669);
-      color: #03150e;
-      font-weight: 700;
-      font-size: 13px;
-      border: none;
-      padding: 11px 18px;
-      border-radius: 10px;
-      cursor: pointer;
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
+      background: linear-gradient(135deg, #06b6d4, #6366f1); color: #ffffff;
+      font-weight: 700; font-size: 13px; border: none; padding: 11px 20px;
+      border-radius: 9px; cursor: pointer; display: inline-flex; align-items: center; gap: 8px;
       transition: transform 0.15s ease, box-shadow 0.15s ease;
     }
-    .btn-primary:hover { transform: translateY(-1px); box-shadow: 0 8px 24px rgba(16, 185, 129, 0.25); }
+    .btn-primary:hover { transform: translateY(-1px); box-shadow: 0 8px 26px rgba(6, 182, 212, 0.25); }
     .btn-secondary {
-      background: rgba(255,255,255,0.05);
-      color: var(--text);
-      font-weight: 600;
-      font-size: 13px;
-      border: 1px solid var(--border);
-      padding: 11px 16px;
-      border-radius: 10px;
-      cursor: pointer;
-      text-decoration: none;
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
+      background: rgba(255,255,255,0.05); color: var(--text); font-weight: 600; font-size: 13px;
+      border: 1px solid var(--border); padding: 11px 16px; border-radius: 9px; cursor: pointer; text-decoration: none;
     }
     .btn-secondary:hover { background: rgba(255,255,255,0.09); }
 
-    /* Metrics Strip */
-    .metrics {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 12px;
-    }
-    .metric-box {
-      background: var(--surface-light);
-      border: 1px solid var(--border);
-      border-radius: 10px;
-      padding: 12px;
-    }
-    .metric-val { font-size: 18px; font-weight: 800; color: var(--text); }
-    .metric-lbl { font-size: 11px; color: var(--muted); }
-
-    /* Interactive HUD Simulator */
-    .hud-shell {
-      background: var(--surface);
-      border: 1px solid rgba(255, 255, 255, 0.1);
-      border-radius: 16px;
-      padding: 16px;
-      box-shadow: 0 24px 70px rgba(0, 0, 0, 0.65), 0 0 0 1px rgba(255,255,255,0.03);
-      display: flex;
-      flex-direction: column;
-      height: 620px;
-      position: relative;
-    }
-    .hud-header {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      margin-bottom: 10px;
-    }
-    .hud-brand {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      font-size: 13px;
-      font-weight: 700;
-    }
-    .hud-pill {
-      font-size: 10px;
-      font-weight: 600;
-      padding: 2px 7px;
-      border-radius: 5px;
-      background: rgba(255,255,255,0.05);
-      border: 1px solid rgba(255,255,255,0.06);
-      color: var(--muted);
-    }
-    .tier-pill {
-      color: #a78bfa;
-      background: rgba(167,139,250,0.1);
-      border-color: rgba(167,139,250,0.22);
-    }
-    .vu-group {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-    .vu-track {
-      width: 28px; height: 4px; border-radius: 2px;
-      background: rgba(255,255,255,0.08);
+    /* Full Desktop Studio Window Twin */
+    .studio-shell {
+      background: var(--bg);
+      border: 1px solid rgba(255, 255, 255, 0.11);
+      border-radius: 14px;
       overflow: hidden;
+      box-shadow: 0 28px 80px rgba(0,0,0,0.72);
+      margin-top: 22px;
     }
-    .vu-fill-mic { height: 100%; width: 0%; background: var(--emerald); transition: width 0.2s; }
-    .vu-fill-call { height: 100%; width: 0%; background: var(--iris); transition: width 0.2s; }
+    .studio-grid {
+      display: grid;
+      grid-template-columns: 210px 1fr 330px;
+      min-height: 540px;
+    }
+    @media (max-width: 980px) {
+      .studio-grid { grid-template-columns: 1fr; }
+      .studio-sidebar { display: none; }
+    }
+    .studio-sidebar {
+      background: var(--sidebar);
+      border-right: 1px solid var(--border);
+      padding: 14px;
+      display: flex; flex-direction: column; justify-content: space-between;
+    }
+    .win-dots { display: flex; gap: 6px; margin-bottom: 14px; }
+    .win-dot { width: 10px; height: 10px; border-radius: 50%; }
+    .brand-row { display: flex; align-items: center; gap: 8px; margin-bottom: 18px; font-weight: 800; font-size: 15px; }
+    .ver-pill { font-size: 9.5px; color: var(--muted); background: rgba(255,255,255,0.06); padding: 2px 6px; border-radius: 4px; border: 1px solid var(--border); }
+    .nav-btn {
+      width: 100%; text-align: left; padding: 9px 11px; border-radius: 8px; border: 1px solid transparent;
+      background: transparent; color: var(--muted); font-size: 12px; font-weight: 500; cursor: pointer; margin-bottom: 5px;
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    .nav-btn:hover { color: #fff; background: rgba(255,255,255,0.04); }
+    .nav-btn.active {
+      color: #fff; font-weight: 600;
+      background: linear-gradient(90deg, rgba(6,182,212,0.16), rgba(99,102,241,0.08));
+      border-color: rgba(6,182,212,0.32);
+    }
+    .profile-card {
+      background: rgba(255,255,255,0.03); border: 1px solid var(--border); border-radius: 10px;
+      padding: 9px 10px; display: flex; align-items: center; gap: 9px;
+    }
+    .avatar-circle {
+      width: 32px; height: 32px; border-radius: 50%; background: #18181b; border: 1.5px solid var(--cyan);
+      display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 12px; color: #22d3ee;
+    }
 
-    /* Toast Nudge */
-    .nudge-toast {
-      display: none;
-      background: rgba(245, 158, 11, 0.08);
-      border: 1px solid rgba(245, 158, 11, 0.22);
-      border-left: 3px solid var(--amber);
-      border-radius: 8px;
-      padding: 9px 11px;
-      margin-bottom: 10px;
-      font-size: 11px;
-      animation: fadeSlide 0.25s ease;
+    /* Center Capture Column */
+    .studio-center { padding: 14px 16px; display: flex; flex-direction: column; gap: 11px; }
+    .topbar-pills { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 8px; padding-bottom: 10px; border-bottom: 1px solid var(--border); }
+    .pill {
+      font-size: 10.5px; font-weight: 600; padding: 4px 10px; border-radius: 6px;
+      background: var(--surface); border: 1px solid var(--border); color: #d4d4d8;
+    }
+    .pill-stealth { background: rgba(6,182,212,0.12); color: #22d3ee; border-color: rgba(6,182,212,0.28); }
+    .wave-card {
+      background: var(--surface); border: 1px solid var(--border); border-radius: 11px; padding: 12px 14px;
+    }
+    .waveform-bars {
+      height: 56px; display: flex; align-items: center; justify-content: space-between; gap: 3px; margin-bottom: 8px;
+    }
+    .wbar {
+      flex: 1; border-radius: 999px; height: 10px;
+      background: linear-gradient(180deg, #06b6d4, #6366f1, #a855f7);
+      transition: height 0.16s ease;
+    }
+    .diag-strip {
+      display: flex; flex-wrap: wrap; justify-content: center; gap: 14px;
+      background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 6px 12px;
+      font-family: "JetBrains Mono", monospace; font-size: 10.5px;
+    }
+    .stream-list {
+      flex: 1; max-height: 290px; overflow-y: auto; display: flex; flex-direction: column; gap: 9px; padding-right: 4px;
+    }
+    .stream-list::-webkit-scrollbar { width: 4px; }
+    .stream-list::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.14); border-radius: 2px; }
+    .stream-card {
+      border-radius: 9px; padding: 10px 12px; font-size: 12.5px; animation: fadeSlide 0.2s ease;
     }
     @keyframes fadeSlide { from { opacity: 0; transform: translateY(-4px); } to { opacity: 1; transform: translateY(0); } }
+    .card-you { background: rgba(6,182,212,0.05); border: 1px solid rgba(6,182,212,0.22); border-left: 3px solid var(--cyan); }
+    .card-attendees { background: rgba(168,85,247,0.05); border: 1px solid rgba(168,85,247,0.22); border-left: 3px solid var(--purple); }
+    .spk-pill { font-size: 9.5px; font-weight: 700; padding: 2px 6px; border-radius: 4px; margin-right: 6px; }
+    .pill-you { background: rgba(6,182,212,0.16); color: #22d3ee; }
+    .pill-att { background: rgba(168,85,247,0.16); color: #c084fc; }
 
-    /* Segmented Capsule Tabs */
-    .tab-capsule {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 3px;
-      background: rgba(255,255,255,0.035);
-      border: 1px solid rgba(255,255,255,0.06);
-      border-radius: 8px;
-      padding: 3px;
-      margin-bottom: 10px;
+    /* Right Inspector Column */
+    .studio-right {
+      background: var(--surface); border-left: 1px solid var(--border); padding: 14px;
+      display: flex; flex-direction: column; gap: 10px;
     }
-    .tab-btn {
-      background: transparent;
-      border: none;
-      color: var(--muted);
-      font-size: 11px;
-      font-weight: 600;
-      padding: 6px 8px;
-      border-radius: 6px;
-      cursor: pointer;
+    .summary-box {
+      background: rgba(255,255,255,0.025); border: 1px solid rgba(255,255,255,0.06);
+      border-radius: 8px; padding: 10px; font-size: 11.5px; color: #d4d4d8;
     }
-    .tab-btn.active {
-      background: rgba(255,255,255,0.1);
-      color: #fff;
+    .btn-row { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+    .btn-mini {
+      background: rgba(255,255,255,0.045); color: #e4e4e7; border: 1px solid rgba(255,255,255,0.10);
+      border-radius: 7px; padding: 7px 10px; font-size: 11px; font-weight: 600; cursor: pointer;
     }
-
-    /* Stream Area */
-    .hud-body {
-      flex: 1;
-      overflow-y: auto;
-      padding-right: 4px;
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
+    .btn-mini:hover { background: rgba(255,255,255,0.10); }
+    .reply-box {
+      flex: 1; background: #09090d; border: 1px solid rgba(6,182,212,0.24); border-radius: 9px;
+      padding: 11px; font-size: 12px; color: #f4f4f5; overflow-y: auto; min-height: 150px;
     }
-    .hud-body::-webkit-scrollbar { width: 4px; }
-    .hud-body::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.15); border-radius: 2px; }
-
-    .stream-card {
-      border-radius: 8px;
-      padding: 10px 12px;
-      font-size: 12.5px;
-      animation: fadeSlide 0.2s ease;
+    .json-pre {
+      font-family: "JetBrains Mono", monospace; font-size: 10.5px; color: #22d3ee; white-space: pre-wrap;
     }
-    .card-attendees {
-      background: rgba(129, 140, 248, 0.045);
-      border: 1px solid rgba(129, 140, 248, 0.16);
-      border-left: 3px solid var(--iris);
+    .rag-input {
+      width: 100%; background: #09090d; border: 1px solid rgba(255,255,255,0.10);
+      border-radius: 8px; padding: 8px 10px; color: #fff; font-size: 11.5px; outline: none;
     }
-    .card-you {
-      background: rgba(16, 185, 129, 0.045);
-      border: 1px solid rgba(16, 185, 129, 0.16);
-      border-left: 3px solid var(--emerald);
-    }
-    .card-decision {
-      background: rgba(255,255,255,0.025);
-      border: 1px solid rgba(255,255,255,0.06);
-      border-left: 3px solid var(--emerald);
-      border-radius: 8px;
-      padding: 10px 12px;
-      font-size: 12px;
-    }
-    .card-decision.superseded { border-left-color: var(--rose); opacity: 0.82; }
-    .card-action {
-      background: rgba(255,255,255,0.025);
-      border: 1px solid rgba(255,255,255,0.06);
-      border-left: 3px solid var(--amber);
-      border-radius: 8px;
-      padding: 10px 12px;
-      font-size: 12px;
-    }
-    .spk-badge {
-      display: inline-block;
-      font-size: 9px;
-      font-weight: 700;
-      padding: 1px 6px;
-      border-radius: 3px;
-      letter-spacing: 0.4px;
-      margin-right: 6px;
-    }
-    .badge-attendees { background: rgba(129,140,248,0.15); color: var(--iris); }
-    .badge-you { background: rgba(16,185,129,0.15); color: var(--emerald); }
-    .badge-active { background: rgba(16,185,129,0.15); color: var(--emerald); }
-    .badge-superseded { background: rgba(244,63,94,0.15); color: var(--rose); }
-    .badge-assignee { background: rgba(245,158,11,0.15); color: var(--amber); }
-
-    .hud-search {
-      margin-top: 10px;
-      width: 100%;
-      background: rgba(255,255,255,0.04);
-      border: 1px solid rgba(255,255,255,0.08);
-      border-radius: 8px;
-      padding: 9px 12px;
-      color: var(--text);
-      font-size: 11.5px;
-      outline: none;
-    }
-    .hud-search:focus { border-color: var(--iris); }
-    .hud-footer {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-top: 8px;
-      font-size: 10.5px;
-      color: var(--dim);
-    }
-
-    /* Architecture Section */
-    .section { margin-top: 56px; }
-    .section-title {
-      font-size: 22px;
-      font-weight: 700;
-      letter-spacing: -0.02em;
-      margin-bottom: 8px;
-    }
-    .section-sub { color: var(--muted); font-size: 14px; margin-bottom: 24px; }
-    .arch-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-      gap: 16px;
-    }
-    .arch-card {
-      background: var(--surface-light);
-      border: 1px solid var(--border);
-      border-radius: 12px;
-      padding: 18px;
-    }
-    .arch-card h3 {
-      font-size: 14px;
-      font-weight: 700;
-      margin-bottom: 8px;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-    .arch-card p { font-size: 12.5px; color: var(--muted); }
-    .hint-chips {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 6px;
-      margin-top: 8px;
-    }
+    .rag-input:focus { border-color: var(--cyan); }
+    .hint-chips { display: flex; flex-wrap: wrap; gap: 6px; }
     .chip {
-      font-size: 10.5px;
-      color: var(--iris);
-      background: rgba(129, 140, 248, 0.1);
-      border: 1px solid rgba(129, 140, 248, 0.2);
-      padding: 2px 8px;
-      border-radius: 999px;
-      cursor: pointer;
+      font-size: 10.5px; color: #22d3ee; background: rgba(6,182,212,0.10);
+      border: 1px solid rgba(6,182,212,0.22); padding: 2px 8px; border-radius: 999px; cursor: pointer;
+    }
+    .studio-statusbar {
+      background: var(--sidebar); border-top: 1px solid var(--border); padding: 6px 14px;
+      font-family: "JetBrains Mono", monospace; font-size: 10px; color: var(--dim);
+      display: flex; justify-content: space-between; flex-wrap: wrap; gap: 8px;
+    }
+
+    /* Sections below */
+    .section { margin-top: 52px; }
+    .section-title { font-size: 22px; font-weight: 700; letter-spacing: -0.02em; margin-bottom: 6px; }
+    .section-sub { color: var(--muted); font-size: 14px; margin-bottom: 20px; }
+    .arch-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 14px; }
+    .arch-card {
+      background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 18px;
+    }
+    .arch-card h3 { font-size: 14px; font-weight: 700; margin-bottom: 8px; }
+    .arch-card p { font-size: 12.5px; color: var(--muted); }
+    .flow-bar {
+      background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 16px;
+      font-family: "JetBrains Mono", monospace; font-size: 11.5px; color: #22d3ee; overflow-x: auto; margin-bottom: 18px;
     }
   </style>
 </head>
 <body>
   <div class="container">
-    <div class="hero">
-      <div>
-        <div class="eyebrow"><span class="dot-pulse"></span> 100% Offline Edge AI • Zero Cloud Leaks</div>
-        <h1>DevListen: Real-Time Edge Meeting Copilot &amp; Bi-Temporal Knowledge Graph</h1>
-        <p class="subtitle">
-          A privacy-first, hardware-stealth desktop AI copilot that captures dual-stream meeting audio locally,
-          indexes architectural decisions into a <strong>Bi-Temporal Knowledge Graph</strong>, and surfaces
-          <strong>Zero-Click Local Vector RAG</strong> nudges in under 10ms—completely invisible to screen shares.
-        </p>
-
-        <div class="badge-row">
-          <span class="tech-badge">faster-whisper (INT8 CPU)</span>
-          <span class="tech-badge">RealtimeSTT (Dual-VAD)</span>
-          <span class="tech-badge">ONNX Vector RAG (BGE-Small)</span>
-          <span class="tech-badge">Bi-Temporal Graph</span>
-          <span class="tech-badge">WASAPI Loopback</span>
-          <span class="tech-badge">AES-256-GCM + DPAPI</span>
-          <span class="tech-badge">Win32 Stealth HUD</span>
-        </div>
-
-        <div class="cta-row">
-          <button class="btn-primary" onclick="startSimulation()">▶ Play Live Meeting Simulation</button>
-          <a class="btn-secondary" href="#architecture">View System Architecture ↓</a>
-        </div>
-
-        <div class="metrics">
-          <div class="metric-box">
-            <div class="metric-val">&lt; 190ms</div>
-            <div class="metric-lbl">INT8 Whisper CPU Latency</div>
-          </div>
-          <div class="metric-box">
-            <div class="metric-val">&lt; 10ms</div>
-            <div class="metric-lbl">384-d ONNX Vector Search</div>
-          </div>
-          <div class="metric-box">
-            <div class="metric-val">0 Bytes</div>
-            <div class="metric-lbl">Sent to External Cloud APIs</div>
-          </div>
-        </div>
+    <div class="hero-top">
+      <div class="eyebrow"><span class="dot-pulse"></span> 100% Offline Edge AI • Zero Cloud Leaks • Hardware-Stealth</div>
+      <h1>DevListen v1.0: Edge AI Meeting Copilot &amp; Bi-Temporal Knowledge Graph</h1>
+      <p class="subtitle">
+        Captures dual-stream audio locally, prevents fast-speech clipping with a <strong>400ms acoustic overlap</strong>,
+        tracks <strong>ACTIVE vs SUPERSEDED</strong> architectural decisions in a Bi-Temporal Graph, and drafts
+        <strong>natural spoken replies</strong> via 384-d ONNX Vector RAG in &lt;10ms.
+      </p>
+      <div class="badge-row">
+        <span class="tech-badge">faster-whisper (CTranslate2 INT8)</span>
+        <span class="tech-badge">RealtimeSTT (Dual-VAD)</span>
+        <span class="tech-badge">BGE-Small 384-d ONNX RAG</span>
+        <span class="tech-badge">Bi-Temporal GraphRAG</span>
+        <span class="tech-badge">400ms Acoustic Overlap</span>
+        <span class="tech-badge">DPAPI + AES-256-GCM</span>
+        <span class="tech-badge">Win32 WDA_EXCLUDEFROMCAPTURE</span>
       </div>
-
-      <!-- Interactive HUD Twin -->
-      <div class="hud-shell">
-        <div class="hud-header">
-          <div class="hud-brand">
-            <span class="dot-pulse"></span>
-            <span>DevListen</span>
-            <span class="hud-pill" id="hud-timer">00:00</span>
-            <span class="hud-pill tier-pill">INT8 CPU</span>
-          </div>
-          <div class="vu-group">
-            <span style="font-size:9px;color:var(--emerald);">●</span>
-            <div class="vu-track"><div class="vu-fill-mic" id="vu-mic"></div></div>
-            <span style="font-size:9px;color:var(--iris);">●</span>
-            <div class="vu-track"><div class="vu-fill-call" id="vu-call"></div></div>
-          </div>
-        </div>
-
-        <div class="nudge-toast" id="nudge-toast"></div>
-
-        <div class="tab-capsule">
-          <button class="tab-btn active" id="tab-notes" onclick="switchTab('notes')">Notes</button>
-          <button class="tab-btn" id="tab-decisions" onclick="switchTab('decisions')">Decisions (<span id="dec-count">2</span>)</button>
-          <button class="tab-btn" id="tab-actions" onclick="switchTab('actions')">Actions (<span id="act-count">0</span>)</button>
-        </div>
-
-        <div class="hud-body" id="hud-body"></div>
-
-        <input class="hud-search" id="hud-search" placeholder="Try Local Vector Search: 'Redis', 'Kubernetes', 'OAuth2' + Enter" onkeydown="if(event.key==='Enter') runQuery(this.value)" />
-        <div class="hint-chips">
-          <span style="font-size:10.5px;color:var(--dim);padding-top:2px;">Quick RAG queries:</span>
-          <span class="chip" onclick="runQuery('database caching plan')">database caching plan</span>
-          <span class="chip" onclick="runQuery('Kubernetes')">Kubernetes</span>
-          <span class="chip" onclick="runQuery('OAuth2')">OAuth2</span>
-        </div>
-        <div class="hud-footer">
-          <span>🔒 Encrypted SQLite WAL • Screen-Share Invisible</span>
-          <span id="sim-status">Ready — Press Play</span>
-        </div>
+      <div class="cta-row">
+        <button class="btn-primary" onclick="startSimulation(false)">▶ Play Live Meeting Simulation</button>
+        <button class="btn-secondary" onclick="startSimulation(true)">🔊 Play with Browser Voice</button>
+        <a class="btn-secondary" href="#architecture">Architectural Flow ↓</a>
       </div>
     </div>
 
+    <!-- Interactive DevListen v1.0 Desktop Studio Twin -->
+    <div class="studio-shell">
+      <div class="studio-grid">
+        <!-- Left Sidebar -->
+        <div class="studio-sidebar">
+          <div>
+            <div class="win-dots">
+              <div class="win-dot" style="background:#ef4444;"></div>
+              <div class="win-dot" style="background:#f59e0b;"></div>
+              <div class="win-dot" style="background:#10b981;"></div>
+            </div>
+            <div class="brand-row">
+              <span style="color:var(--cyan);">❚❙❚</span>
+              <span>DevListen</span>
+              <span class="ver-pill">v1.0</span>
+            </div>
+            <button class="nav-btn active" id="nav-capture" onclick="switchView('capture')"><span>Live Capture</span><span style="color:#ef4444;font-size:9px;">●</span></button>
+            <button class="nav-btn" id="nav-decisions" onclick="switchView('decisions')"><span>Decisions &amp; RAG</span><span id="dec-count">2</span></button>
+            <button class="nav-btn" id="nav-actions" onclick="switchView('actions')"><span>Action Items</span><span id="act-count">0</span></button>
+          </div>
+          <div class="profile-card">
+            <div class="avatar-circle">D</div>
+            <div>
+              <div style="font-size:12px;font-weight:700;">Devanshu</div>
+              <div style="font-size:9.5px;color:var(--emerald);">🔒 Zero-Trust Vault</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Center Capture Column -->
+        <div class="studio-center">
+          <div class="topbar-pills">
+            <strong style="font-size:13px;" id="view-title">Live Capture &amp; Diarization</strong>
+            <div style="display:flex;gap:6px;flex-wrap:wrap;">
+              <span class="pill">🎙️ System Audio + Mic (16kHz)</span>
+              <span class="pill" style="color:#a5b4fc;border-color:rgba(99,102,241,0.3);">⚡ INT8 CPU • Ready</span>
+              <span class="pill pill-stealth">● Screen-Share Invisible</span>
+            </div>
+          </div>
+
+          <div class="wave-card">
+            <div class="waveform-bars" id="waveform-bars"></div>
+            <div style="display:flex;justify-content:space-between;font-size:11px;color:var(--muted);">
+              <span>Live_Meeting_Active.wav</span>
+              <span><span id="hud-timer">00:00</span> / LIVE &nbsp; <strong style="color:#ef4444;">● REC</strong></span>
+            </div>
+          </div>
+
+          <div class="diag-strip">
+            <span style="color:var(--emerald);">● Confidence: 97.4%</span>
+            <span style="color:#22d3ee;">⏱ Latency: &lt;190ms</span>
+            <span style="color:var(--muted);">🔊 16kHz Mono PCM</span>
+          </div>
+
+          <div class="stream-list" id="stream-list"></div>
+        </div>
+
+        <!-- Right Inspector: Suggested Response & JSON Toggle -->
+        <div class="studio-right">
+          <div style="font-size:13px;font-weight:700;">AI Copilot &amp; Suggested Reply</div>
+          <div class="summary-box" id="insights-box">
+            <span style="color:var(--cyan);">●</span> <b>Status:</b> Press <b>Play Live Meeting Simulation</b><br>
+            <span style="color:var(--indigo);">●</span> <b>Decisions:</b> 2 seeded in Bi-Temporal Graph<br>
+            <span style="color:var(--amber);">●</span> <b>Action Items:</b> 0 extracted
+          </div>
+          <div class="btn-row">
+            <button class="btn-mini" id="btn-json-toggle" onclick="toggleJson()">&lt;/&gt; Raw JSON</button>
+            <button class="btn-mini" onclick="runQuery('Redis')">⚡ Test RAG Reply</button>
+          </div>
+          <div class="reply-box" id="reply-box">
+            <div style="color:#22d3ee;font-weight:700;font-size:11px;margin-bottom:6px;">💬 SUGGESTED RESPONSE (HISTORICAL RAG)</div>
+            <div style="color:var(--muted);font-size:11.5px;">When an attendee asks a question, DevListen queries your Bi-Temporal Knowledge Graph and drafts a natural, ready-to-speak answer here.</div>
+          </div>
+          <input class="rag-input" id="rag-input" placeholder="Ask Local RAG (e.g. 'Redis', 'Kubernetes') + Enter" onkeydown="if(event.key==='Enter') runQuery(this.value)" />
+          <div class="hint-chips">
+            <span class="chip" onclick="runQuery('GraphQL caching')">GraphQL caching</span>
+            <span class="chip" onclick="runQuery('Kubernetes')">Kubernetes</span>
+            <span class="chip" onclick="runQuery('OAuth2')">OAuth2</span>
+          </div>
+        </div>
+      </div>
+      <div class="studio-statusbar">
+        <span>Local Engine: faster-whisper INT8  |  Vector RAG: BGE-Small ONNX  |  Latency: &lt;190ms  |  Vault: DPAPI + AES-256-GCM</span>
+        <span id="sim-status">Ready</span>
+      </div>
+    </div>
+
+    <!-- Architecture Flow & Why It's Efficient -->
     <div class="section" id="architecture">
-      <h2 class="section-title">Production &amp; Organization-Level Architecture</h2>
-      <p class="section-sub">Engineered to solve real-world edge latency, memory drift, and enterprise confidentiality.</p>
-      <div class="arch-grid">
-        <div class="arch-card">
-          <h3>🎙️ Dual-Stream Edge ASR</h3>
-          <p>Separates your microphone (<code>RealtimeSTT</code> dual-VAD sub-100ms streaming) from remote attendees (<code>WASAPI Loopback</code> + <code>faster-whisper</code> INT8). Uses a <strong>400ms acoustic boundary overlap</strong> and N-gram deduplication so fast speakers never lose boundary words.</p>
-        </div>
-        <div class="arch-card">
-          <h3>🧠 Bi-Temporal Knowledge Graph</h3>
-          <p>Tracks technical decisions with chronological state decay (<code>ACTIVE</code> vs <code>SUPERSEDED</code>). When a new architecture choice overrides an older one, the graph preserves lineage so RAG never surfaces stale truth.</p>
-        </div>
-        <div class="arch-card">
-          <h3>⚡ Zero-Click Local Vector RAG</h3>
-          <p>Embeds decisions using <code>BAAI/bge-small-en-v1.5</code> (384-d ONNX via <code>fastembed</code>). Detects spoken questions in real time and surfaces context flashcards in &lt;10ms without touching the keyboard.</p>
-        </div>
-        <div class="arch-card">
-          <h3>🛡️ Zero-Trust Vault &amp; Stealth HUD</h3>
-          <p>Transcripts are encrypted at rest via Windows DPAPI + <strong>AES-256-GCM</strong> in SQLite WAL mode. The PySide6 HUD enforces Win32 <code>WDA_EXCLUDEFROMCAPTURE</code> so it stays 100% invisible on Zoom/Teams/OBS screen shares.</p>
-        </div>
+      <h2 class="section-title">Architectural Flow &amp; Why It Is Efficient</h2>
+      <p class="section-sub">Engineered for zero-cloud privacy, minimal CPU footprint, and zero stale context in RAG.</p>
+      <div class="flow-bar">
+        [Mic + WASAPI Loopback] ➔ [400ms Overlap INT8 Whisper + RealtimeSTT] ➔ [Turn Aggregator (N-gram Dedupe)] ➔ [Bi-Temporal Graph + 384-d ONNX RAG] ➔ [Natural Suggested Reply + DPAPI/AES-256 Vault]
       </div>
-    </div>
-
-    <div class="section" id="decisions-roadmap">
-      <h2 class="section-title">Engineering Trade-offs: Modern Edge AI vs. Old-School Tech</h2>
-      <p class="section-sub">Key architectural decisions made to eliminate latency, hallucination, and privacy leaks.</p>
       <div class="arch-grid">
         <div class="arch-card">
-          <h3>⚡ Dual-Stream + 400ms Overlap vs. Naive VAD Chunking</h3>
-          <p><strong>Old-School:</strong> Hard-chopping audio at fixed 2s intervals with Silero VAD drops unstressed words on fast speakers.<br><strong>DevListen:</strong> Dual-stream separation (<code>YOU</code> vs <code>ATTENDEES</code>) + 400ms acoustic boundary overlap &amp; N-gram deduplication preserves 100% of boundary syllables.</p>
+          <h3>🎙️ Dual-Stream + 400ms Overlap</h3>
+          <p>Separating Mic (<code>YOU</code>) from Loopback (<code>ATTENDEES</code>) eliminates echo and self-diarization drift. Keeping a 400ms trailing audio overlap with <code>vad_filter=False</code> ensures rapid speakers never lose boundary syllables.</p>
         </div>
         <div class="arch-card">
-          <h3>🕒 Bi-Temporal Graph vs. Flat Vector RAG</h3>
-          <p><strong>Old-School:</strong> Flat vector DBs retrieve deprecated decisions alongside current ones, causing contradictions.<br><strong>DevListen:</strong> Models <code>ACTIVE</code> vs <code>SUPERSEDED</code> state lineage so RAG always surfaces current architectural truth.</p>
+          <h3>🕒 Bi-Temporal Graph vs. Flat RAG</h3>
+          <p>Flat vector DBs surface deprecated decisions alongside current ones. Modeling <code>ACTIVE</code> vs <code>SUPERSEDED</code> state lineage guarantees RAG retrieves only current architectural truth in &lt;10ms.</p>
         </div>
         <div class="arch-card">
-          <h3>🔐 Local ONNX + INT8 vs. Cloud APIs</h3>
-          <p><strong>Old-School:</strong> Streaming corporate audio to external APIs creates compliance risk and 600ms+ network jitter.<br><strong>DevListen:</strong> Runs <code>faster-whisper</code> INT8 + <code>BGE-Small</code> ONNX locally in &lt;190ms with zero bytes leaving the device.</p>
+          <h3>⚡ Quantized INT8 + ONNX CPU</h3>
+          <p>Runs <code>faster-whisper</code> (CTranslate2 INT8) and <code>BAAI/bge-small-en-v1.5</code> (ONNX) locally without a datacenter GPU—delivering &lt;190ms ASR latency and 0 bytes sent to external APIs.</p>
         </div>
       </div>
 
-      <h2 class="section-title" style="margin-top:42px;">Active Engineering Roadmap &amp; Open-Source Call (Contributions Welcome!)</h2>
-      <p class="section-sub">Built transparently in the open—our current local STT pipeline already outperforms most out-of-the-box open-source setups, and here is what we're tackling next.</p>
+      <h2 class="section-title" style="margin-top:42px;">Active Roadmap &amp; Open-Source Call (Contributions Welcome!)</h2>
+      <p class="section-sub">Our current local STT pipeline already outperforms most out-of-the-box open-source setups. Here is what we are building next:</p>
       <div class="arch-grid">
         <div class="arch-card">
           <h3>🧠 Toward DeepSeek Nova2 &amp; Qwen 3.8</h3>
-          <p>Actively working to bring local suggested-response quality closer to <strong>DeepSeek Nova2</strong>. Due to local hardware constraints, larger open-source LLMs like <strong>Qwen 3.8</strong> haven't been benchmarked yet—GPU contributors welcome!</p>
+          <p>Working to bring local suggested-response quality closer to <strong>DeepSeek Nova2</strong>. Due to local hardware constraints, larger open-source LLMs like <strong>Qwen 3.8</strong> haven't been benchmarked yet—GPU contributors are warmly welcome!</p>
         </div>
         <div class="arch-card">
           <h3>🗣️ Universal Plugin-Free Diarization</h3>
-          <p>Engineering app-agnostic multi-speaker diarization across <strong>Zoom, Microsoft Teams, Google Meet, and Webex</strong> directly from system audio—no brittle per-app plugins or intrusive meeting bots required.</p>
+          <p>Building app-agnostic speaker diarization across <strong>Zoom, Microsoft Teams, Google Meet, and Webex</strong> directly from system audio—no brittle per-app plugins or intrusive meeting bots.</p>
         </div>
         <div class="arch-card">
           <h3>🍎 Windows Today → macOS Next</h3>
@@ -510,223 +372,234 @@
   </div>
 
   <script>
-    let currentTab = "notes";
+    const BAR_COUNT = 48;
+    const waveContainer = document.getElementById("waveform-bars");
+    const bars = [];
+    for (let i = 0; i < BAR_COUNT; i++) {
+      const b = document.createElement("div");
+      b.className = "wbar";
+      waveContainer.appendChild(b);
+      bars.push(b);
+    }
+
+    let waveEnergy = 0.08;
+    let wavePhase = 0;
+    setInterval(() => {
+      wavePhase += 0.3;
+      bars.forEach((b, i) => {
+        const env = Math.sin(Math.PI * i / (BAR_COUNT - 1));
+        const wave = 0.5 + 0.5 * Math.sin(wavePhase + i * 0.38);
+        const h = Math.max(6, Math.min(52, (6 + waveEnergy * 46 * wave) * (0.35 + 0.65 * env)));
+        b.style.height = h + "px";
+      });
+    }, 65);
+
+    let currentView = "capture";
+    let showJson = false;
     let simTimers = [];
     let clockInterval = null;
-    let secondsElapsed = 0;
+    let seconds = 0;
+    let useVoice = false;
 
     const notes = [];
     const decisions = [
-      {
-        entity: "GraphQL Caching",
-        status: "ACTIVE",
-        summary: "Hold off on Redis until Schema v2 lands to avoid memory overhead.",
-        meta: "Proposed by You • Decided by Team"
-      },
-      {
-        entity: "GraphQL Caching",
-        status: "SUPERSEDED",
-        summary: "Use Redis for response caching across all endpoints.",
-        meta: "Proposed by Alex • Superseded by Schema v2 decision"
-      }
+      { entity: "GraphQL Caching", status: "ACTIVE", summary: "Hold off on Redis until Schema v2 lands to avoid memory overhead." },
+      { entity: "GraphQL Caching", status: "SUPERSEDED", summary: "Use Redis for response caching across all endpoints." }
     ];
     const actions = [];
 
-    const vectorKB = [
+    const kb = [
       {
-        keys: ["redis", "cache", "caching", "database", "memory"],
+        keys: ["redis", "cache", "caching", "graphql"],
         entity: "GraphQL Caching",
-        score: "0.84",
-        active: "Hold off on Redis until Schema v2 lands to avoid memory overhead.",
-        prior: "Use Redis for response caching across all endpoints."
+        spoken: "For <b>GraphQL Caching</b>, we decided to hold off on Redis until Schema v2 lands to avoid memory overhead. (Our earlier plan was to use Redis for response caching across all endpoints, but we superseded that.)",
+        raw: { entity: "GraphQL Caching", status: "ACTIVE", similarity: 0.84, superseded: "Use Redis across all endpoints" }
       },
       {
-        keys: ["kubernetes", "k8s", "nginx", "ingress", "postgres"],
+        keys: ["kubernetes", "k8s", "nginx", "postgres"],
         entity: "Kubernetes Ingress",
-        score: "0.79",
-        active: "Deployed Kubernetes with NGINX ingress controller backed by PostgreSQL.",
-        prior: null
+        spoken: "For <b>Kubernetes Ingress</b>, we decided to deploy the Kubernetes cluster with an NGINX ingress controller hooked up to PostgreSQL.",
+        raw: { entity: "Kubernetes Ingress", status: "ACTIVE", similarity: 0.79 }
       },
       {
-        keys: ["oauth", "oauth2", "jwt", "auth", "grpc"],
+        keys: ["oauth", "oauth2", "jwt", "auth"],
         entity: "Auth & Transport",
-        score: "0.76",
-        active: "Migrate gRPC services to OAuth2 with short-lived JWT tokens.",
-        prior: "Legacy session cookies on REST gateway."
+        spoken: "For <b>Auth &amp; Transport</b>, we agreed to migrate gRPC services to OAuth2 with short-lived JWT tokens.",
+        raw: { entity: "Auth & Transport", status: "ACTIVE", similarity: 0.76 }
       }
     ];
 
-    function switchTab(tab) {
-      currentTab = tab;
-      ["notes", "decisions", "actions"].forEach(t => {
-        document.getElementById("tab-" + t).classList.toggle("active", t === tab);
+    let lastReply = kb[0];
+
+    function switchView(v) {
+      currentView = v;
+      ["capture", "decisions", "actions"].forEach(id => {
+        document.getElementById("nav-" + id).classList.toggle("active", id === v);
       });
-      renderBody();
+      const titles = { capture: "Live Capture & Diarization", decisions: "Bi-Temporal Decisions & RAG", actions: "Extracted Action Items" };
+      document.getElementById("view-title").textContent = titles[v];
+      renderStream();
     }
 
-    function renderBody() {
-      const body = document.getElementById("hud-body");
-      body.innerHTML = "";
-      if (currentTab === "notes") {
-        if (notes.length === 0) {
-          body.innerHTML = `<div style="color:var(--dim);font-size:12px;text-align:center;margin-top:40px;">Click <b>▶ Play Live Meeting Simulation</b> to watch the live dual-stream pipeline.</div>`;
+    function renderStream() {
+      const list = document.getElementById("stream-list");
+      list.innerHTML = "";
+      if (currentView === "capture") {
+        if (!notes.length) {
+          list.innerHTML = `<div style="color:var(--dim);font-size:12px;text-align:center;margin-top:40px;">Click <b>▶ Play Live Meeting Simulation</b> to watch dual-stream ASR &amp; natural RAG replies.</div>`;
           return;
         }
         notes.forEach(n => {
-          const div = document.createElement("div");
-          div.className = "stream-card " + (n.speaker === "YOU" ? "card-you" : "card-attendees");
-          const badgeClass = n.speaker === "YOU" ? "badge-you" : "badge-attendees";
-          div.innerHTML = `
-            <div style="margin-bottom:5px;">
-              <span class="spk-badge ${badgeClass}">${n.speaker}</span>
-              <span style="color:var(--dim);font-size:10px;">${n.time}</span>
-            </div>
-            <div style="color:#f1f5f9;line-height:1.5;">${n.text}</div>
-          `;
-          body.appendChild(div);
+          const d = document.createElement("div");
+          d.className = "stream-card " + (n.speaker === "YOU" ? "card-you" : "card-attendees");
+          const pClass = n.speaker === "YOU" ? "pill-you" : "pill-att";
+          d.innerHTML = `<div style="margin-bottom:4px;"><span class="spk-pill ${pClass}">${n.speaker}</span><span style="color:var(--dim);font-size:10px;">${n.time}</span></div><div style="color:#f4f4f5;">${n.text}</div>`;
+          list.appendChild(d);
         });
-      } else if (currentTab === "decisions") {
-        decisions.forEach(d => {
-          const div = document.createElement("div");
-          div.className = "card-decision " + (d.status === "SUPERSEDED" ? "superseded" : "");
-          const pill = d.status === "ACTIVE" ? "badge-active" : "badge-superseded";
-          div.innerHTML = `
-            <div style="margin-bottom:4px;">
-              <span class="spk-badge ${pill}">${d.status}</span>
-              <strong style="color:#f8fafc;">${d.entity}</strong>
-            </div>
-            <div style="color:#cbd5e1;margin-bottom:4px;">${d.summary}</div>
-            <div style="color:var(--dim);font-size:10px;">${d.meta}</div>
-          `;
-          body.appendChild(div);
+      } else if (currentView === "decisions") {
+        decisions.forEach(dec => {
+          const col = dec.status === "ACTIVE" ? "#10b981" : "#f43f5e";
+          const d = document.createElement("div");
+          d.className = "stream-card";
+          d.style.cssText = `background:#0c0c10;border:1px solid var(--border);border-left:3px solid ${col};`;
+          d.innerHTML = `<div style="color:${col};font-weight:700;font-size:11px;">[${dec.status}] ${dec.entity}</div><div style="color:#e4e4e7;margin-top:3px;">${dec.summary}</div>`;
+          list.appendChild(d);
         });
       } else {
-        if (actions.length === 0) {
-          body.innerHTML = `<div style="color:var(--dim);font-size:12px;text-align:center;margin-top:40px;">Action items extracted from speech appear here automatically.</div>`;
+        if (!actions.length) {
+          list.innerHTML = `<div style="color:var(--dim);font-size:12px;text-align:center;margin-top:40px;">Extracted action items appear here automatically.</div>`;
           return;
         }
         actions.forEach(a => {
-          const div = document.createElement("div");
-          div.className = "card-action";
-          div.innerHTML = `
-            <div style="margin-bottom:4px;"><span class="spk-badge badge-assignee">@${a.assignee}</span></div>
-            <div style="color:#f1f5f9;">• ${a.task}</div>
-          `;
-          body.appendChild(div);
+          const d = document.createElement("div");
+          d.className = "stream-card";
+          d.style.cssText = `background:#0c0c10;border:1px solid var(--border);border-left:3px solid #f59e0b;`;
+          d.innerHTML = `<div style="color:#f59e0b;font-weight:700;font-size:11px;">@${a.assignee}</div><div style="color:#e4e4e7;margin-top:3px;">☐ ${a.task}</div>`;
+          list.appendChild(d);
         });
       }
-      body.scrollTop = body.scrollHeight;
+      list.scrollTop = list.scrollHeight;
     }
 
-    function showNudge(title, entity, activeText, priorText, score) {
-      const toast = document.getElementById("nudge-toast");
-      toast.style.display = "block";
-      toast.innerHTML = `
-        <div style="color:var(--amber);font-weight:700;margin-bottom:4px;">💡 ZERO-CLICK LOCAL RAG (${score} cos-sim): ${title}</div>
-        <div style="color:var(--iris);font-weight:700;">${entity}</div>
-        <div style="color:var(--emerald);font-weight:600;margin-top:2px;">• CURRENT TRUTH [ACTIVE]:</div>
-        <div style="color:#f1f5f9;margin-left:8px;">${activeText}</div>
-        ${priorText ? `<div style="color:var(--dim);font-size:10px;margin-left:8px;margin-top:2px;"><s>${priorText}</s> <span style="color:var(--rose);">[SUPERSEDED]</span></div>` : ""}
-      `;
+    function renderReply(question, item) {
+      lastReply = item;
+      const box = document.getElementById("reply-box");
+      if (showJson) {
+        box.innerHTML = `<pre class="json-pre">${JSON.stringify({ question, ...item.raw }, null, 2)}</pre>`;
+      } else {
+        box.innerHTML = `
+          <div style="color:#22d3ee;font-weight:700;font-size:11px;margin-bottom:6px;">💬 SUGGESTED RESPONSE</div>
+          <div style="color:var(--muted);font-size:10.5px;margin-bottom:7px;"><b>Asked:</b> "${question}"</div>
+          <div style="background:rgba(6,182,212,0.08);border-left:3px solid var(--cyan);padding:9px;border-radius:5px;line-height:1.5;">"${item.spoken}"</div>
+        `;
+      }
+    }
+
+    function toggleJson() {
+      showJson = !showJson;
+      document.getElementById("btn-json-toggle").textContent = showJson ? "💬 Suggested Reply" : "</> Raw JSON";
+      renderReply("Latest Context", lastReply);
     }
 
     function runQuery(q) {
       const query = (q || "").trim().toLowerCase();
       if (!query) return;
-      const match = vectorKB.find(item => item.keys.some(k => query.includes(k))) || vectorKB[0];
-      showNudge(`Query "${q}"`, match.entity, match.active, match.prior, match.score);
-      document.getElementById("hud-search").value = "";
+      const match = kb.find(k => k.keys.some(w => query.includes(w))) || kb[0];
+      renderReply(q, match);
+      document.getElementById("rag-input").value = "";
     }
 
-    function setVU(mic, call) {
-      document.getElementById("vu-mic").style.width = mic + "%";
-      document.getElementById("vu-call").style.width = call + "%";
+    function speakLine(text) {
+      if (!useVoice || !("speechSynthesis" in window)) return;
+      window.speechSynthesis.cancel();
+      const u = new SpeechSynthesisUtterance(text);
+      u.rate = 1.03;
+      window.speechSynthesis.speak(u);
     }
 
-    function startSimulation() {
+    function updateInsights() {
+      const latest = notes.length ? notes[notes.length - 1].text.slice(0, 68) + "..." : "Listening...";
+      document.getElementById("insights-box").innerHTML = `
+        <span style="color:var(--cyan);">●</span> <b>Latest:</b> ${latest}<br>
+        <span style="color:var(--indigo);">●</span> <b>Decisions:</b> ${decisions.length} logged<br>
+        <span style="color:var(--amber);">●</span> <b>Actions:</b> ${actions.length} extracted
+      `;
+      document.getElementById("dec-count").textContent = decisions.length;
+      document.getElementById("act-count").textContent = actions.length;
+    }
+
+    function startSimulation(withVoice) {
+      useVoice = withVoice;
       simTimers.forEach(clearTimeout);
       simTimers = [];
       if (clockInterval) clearInterval(clockInterval);
+      if ("speechSynthesis" in window) window.speechSynthesis.cancel();
 
       notes.length = 0;
       actions.length = 0;
       while (decisions.length > 2) decisions.shift();
-      document.getElementById("dec-count").textContent = decisions.length;
-      document.getElementById("act-count").textContent = "0";
-      document.getElementById("nudge-toast").style.display = "none";
-      switchTab("notes");
+      switchView("capture");
+      updateInsights();
 
-      secondsElapsed = 0;
+      seconds = 0;
       document.getElementById("hud-timer").textContent = "00:00";
       document.getElementById("sim-status").textContent = "Streaming live...";
       clockInterval = setInterval(() => {
-        secondsElapsed++;
-        const m = String(Math.floor(secondsElapsed / 60)).padStart(2, "0");
-        const s = String(secondsElapsed % 60).padStart(2, "0");
-        document.getElementById("hud-timer").textContent = `${m}:${s}`;
+        seconds++;
+        document.getElementById("hud-timer").textContent =
+          String(Math.floor(seconds / 60)).padStart(2, "0") + ":" + String(seconds % 60).padStart(2, "0");
       }, 1000);
 
-      const schedule = [
-        [400, () => {
-          setVU(0, 62);
-          notes.push({ speaker: "ATTENDEES", time: "10:02 AM", text: "All right team, we need to finalize our caching tier before the v2 release date. Are we sticking with Redis?" });
-          renderBody();
+      const steps = [
+        [300, () => {
+          waveEnergy = 0.72;
+          const t = "All right team, we need to finalize our database and caching tier before the v2 release. Are we sticking with Redis?";
+          notes.push({ speaker: "ATTENDEES", time: "00:02", text: t });
+          speakLine(t); renderStream(); updateInsights();
         }],
-        [2400, () => {
-          setVU(74, 0);
-          notes.push({ speaker: "YOU", time: "10:02 AM", text: "I thought we agreed to hold off on Redis until Schema v2 lands to avoid unnecessary memory overhead." });
-          renderBody();
-        }],
-        [4500, () => {
-          setVU(0, 58);
-          notes.push({ speaker: "ATTENDEES", time: "10:02 AM", text: "Wait, what did we decide about GraphQL caching last month?" });
-          renderBody();
-        }],
-        [5600, () => {
-          showNudge(
-            "\"what did we decide about GraphQL caching...\"",
-            "GraphQL Caching",
-            "Hold off on Redis until Schema v2 lands to avoid memory overhead.",
-            "Use Redis for response caching across all endpoints.",
-            "0.84"
-          );
+        [4200, () => {
+          waveEnergy = 0.78;
+          const t = "I thought we agreed to hold off on Redis until Schema v2 lands to avoid unnecessary memory overhead.";
+          notes.push({ speaker: "YOU", time: "00:06", text: t });
+          speakLine(t); renderStream(); updateInsights();
         }],
         [8200, () => {
-          setVU(0, 68);
-          notes.push({ speaker: "ATTENDEES", time: "10:03 AM", text: "Got it, makes total sense. Let's deploy Kubernetes with an NGINX ingress controller backed by PostgreSQL, and migrate gRPC auth to OAuth2." });
-          renderBody();
+          waveEnergy = 0.68;
+          const t = "Wait, what did we decide about the GraphQL caching strategy last month?";
+          notes.push({ speaker: "ATTENDEES", time: "00:10", text: t });
+          speakLine(t); renderStream(); updateInsights();
         }],
-        [9500, () => {
-          decisions.unshift({
-            entity: "Kubernetes Ingress",
-            status: "ACTIVE",
-            summary: "Deployed Kubernetes with NGINX ingress controller backed by PostgreSQL; migrating gRPC auth to OAuth2.",
-            meta: "Proposed by Attendees • Decided by Team"
-          });
-          document.getElementById("dec-count").textContent = decisions.length;
+        [9600, () => { renderReply("Wait, what did we decide about the GraphQL caching strategy last month?", kb[0]); }],
+        [12000, () => {
+          waveEnergy = 0.75;
+          const t = "Got it, makes total sense. Let's deploy the Kubernetes cluster with an NGINX ingress controller hooked up to PostgreSQL.";
+          notes.push({ speaker: "ATTENDEES", time: "00:14", text: t });
+          decisions.unshift({ entity: "Kubernetes Ingress", status: "ACTIVE", summary: "Deployed Kubernetes cluster with NGINX ingress controller hooked up to PostgreSQL." });
+          speakLine(t); renderStream(); updateInsights();
         }],
-        [11400, () => {
-          setVU(0, 52);
-          notes.push({ speaker: "ATTENDEES", time: "10:03 AM", text: "Sanchit, can you update the ADR documentation and sync with the DevOps team by tomorrow morning?" });
-          renderBody();
-          actions.push({ assignee: "Sanchit", task: "Update the ADR documentation and sync with the DevOps team by tomorrow morning." });
-          document.getElementById("act-count").textContent = actions.length;
+        [16500, () => {
+          waveEnergy = 0.65;
+          const t = "Devanshu, can you update the ADR documentation and sync with the DevOps team by tomorrow morning?";
+          notes.push({ speaker: "ATTENDEES", time: "00:18", text: t });
+          actions.push({ assignee: "Devanshu", task: "Update the ADR documentation and sync with the DevOps team by tomorrow morning." });
+          speakLine(t); renderStream(); updateInsights();
         }],
-        [13500, () => {
-          setVU(68, 0);
-          notes.push({ speaker: "YOU", time: "10:03 AM", text: "On it. I'll export the meeting minutes and push the updated ADR." });
-          renderBody();
+        [20500, () => {
+          waveEnergy = 0.70;
+          const t = "On it. I'll export the meeting minutes and share the updated ADR with the infra squad.";
+          notes.push({ speaker: "YOU", time: "00:22", text: t });
+          speakLine(t); renderStream(); updateInsights();
         }],
-        [14800, () => {
-          setVU(0, 0);
-          document.getElementById("sim-status").textContent = "Completed — Explore Tabs or Search RAG!";
+        [23500, () => {
+          waveEnergy = 0.08;
+          document.getElementById("sim-status").textContent = "Simulation complete — Explore tabs or test Local RAG!";
         }]
       ];
 
-      schedule.forEach(([ms, fn]) => simTimers.push(setTimeout(fn, ms)));
+      steps.forEach(([ms, fn]) => simTimers.push(setTimeout(fn, ms)));
     }
 
-    renderBody();
+    renderStream();
   </script>
 </body>
 </html>
