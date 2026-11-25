@@ -8,7 +8,7 @@
 ### 🌐 Interactive Live Showcase (Works on Mobile & Corporate Laptops)
 Recruiters and hiring managers can test the interactive HUD, **Bi-Temporal Decision Graph**, and **Local Vector RAG** directly in their browser without installing anything:
 
-👉 **[Launch Interactive Web Demo (`docs/index.html`)](docs/index.html)** *(Host via GitHub Pages: Settings → Pages → `main` / `/docs`)*
+👉 **[Launch Interactive Web Demo](https://devanshu777.github.io/DevListen/)** *(Works on Mobile & Corporate Laptops — Zero Install)*
 
 ---
 
