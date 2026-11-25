@@ -52,35 +52,30 @@ So I built **DevListen** from scratch to run **100% locally on CPU**—combining
 ## 🏗️ Layered System Architecture
 
 ```mermaid
-flowchart TB
-    subgraph L1["Layer 1: OS Audio & Hardware Ingestion"]
-        MIC["User Mic (44.1/48kHz)"] -->|"WebRTC VAD + RingBuffer"| RES1["16kHz Mono PCM"]
-        LB["WASAPI Loopback (Zoom/Teams/Meet/Webex)"] -->|"Polyphase Sinc Resample"| RES2["16kHz Mono PCM"]
+flowchart TD
+    subgraph L1["1️⃣ Audio Capture Layer (OS Driver Level)"]
+        A["🎤 Your Mic (44.1/48kHz)"] & B["🔊 Meeting Audio (WASAPI Loopback)"] --> C["16kHz Mono PCM + VAD Gate"]
     end
 
-    subgraph L2["Layer 2: Edge Streaming ASR & Turn Aggregation"]
-        RES1 -->|"Sub-100ms"| RT["RealtimeSTT (tiny + base)"]
-        RES2 -->|"400ms Acoustic Overlap"| LT["faster-whisper (CTranslate2 INT8)"]
-        RT -->|"YOU"| AGG["ConversationalTurnAggregator (1-5 Word N-gram Dedupe)"]
-        LT -->|"ATTENDEES"| AGG
+    subgraph L2["2️⃣ Edge Speech-to-Text Layer (100% Offline CPU)"]
+        C -->|"Sub-100ms"| D["RealtimeSTT (YOU)"]
+        C -->|"400ms Overlap"| E["faster-whisper INT8 (ATTENDEES)"]
+        D & E --> F["Conversational Turn Aggregator"]
     end
 
-    subgraph L3["Layer 3: Cognitive NLP & Bi-Temporal GraphRAG"]
-        AGG --> EXT["DecisionExtractor + CommitmentExtractor"]
-        AGG --> QD["QuestionDetector"]
-        EXT -->|"ACTIVE / SUPERSEDED Lineage"| GRAPH["TemporalDecisionGraph"]
-        GRAPH -->|"384-d ONNX Embeddings"| VEC["fastembed (BAAI/bge-small-en-v1.5)"]
-        QD -->|"Sub-10ms Cosine Search"| VEC
+    subgraph L3["3️⃣ Memory & Knowledge Graph Layer"]
+        F --> G["Decision & Action Extractors"]
+        G --> H["Bi-Temporal Graph (ACTIVE vs SUPERSEDED)"]
+        H --> I["384-d ONNX Vector Search (<10ms)"]
     end
 
-    subgraph L4["Layer 4: Zero-Trust Persistence"]
-        AGG -->|"DPAPI + AES-256-GCM"| VAULT["Encrypted SQLite WAL Vault"]
-        VAULT --> EXP["Markdown ADR Exporter"]
+    subgraph L4["4️⃣ Security & Persistence Layer"]
+        F --> J["DPAPI + AES-256-GCM Encrypted SQLite WAL"]
     end
 
-    subgraph L5["Layer 5: Hardware-Stealth Presentation"]
-        VEC -->|"Natural Suggested Reply"| HUD["DevListen Studio (PySide6 + WDA_EXCLUDEFROMCAPTURE 0x11)"]
-        AGG --> HUD
+    subgraph L5["5️⃣ Stealth Desktop UI"]
+        I --> K["DevListen Studio HUD (Screen-Share Invisible)"]
+        F --> K
     end
 ```
 
