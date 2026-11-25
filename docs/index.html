@@ -446,14 +446,14 @@
       list.innerHTML = "";
       if (currentView === "capture") {
         if (!notes.length) {
-          list.innerHTML = `<div style="color:var(--dim);font-size:12px;text-align:center;margin-top:40px;">Click <b>▶ Play Live Meeting Simulation</b> to watch dual-stream ASR &amp; natural RAG replies.</div>`;
+          list.innerHTML = `<div style="color:var(--dim);font-size:12px;text-align:center;margin-top:40px;">Click <b>▶ Play Live Demo (Neural AI Voices)</b> to watch dual-stream ASR &amp; natural RAG replies.</div>`;
           return;
         }
-        notes.forEach(n => {
+        notes.forEach((n, idx) => {
           const d = document.createElement("div");
           d.className = "stream-card " + (n.speaker === "YOU" ? "card-you" : "card-attendees");
           const pClass = n.speaker === "YOU" ? "pill-you" : "pill-att";
-          d.innerHTML = `<div style="margin-bottom:4px;"><span class="spk-pill ${pClass}">${n.speaker}</span><span style="color:var(--dim);font-size:10px;">${n.time}</span></div><div style="color:#f4f4f5;">${n.text}</div>`;
+          d.innerHTML = `<div style="margin-bottom:4px;"><span class="spk-pill ${pClass}">${n.speaker}</span><span style="color:var(--dim);font-size:10px;">${n.time}</span></div><div id="note-txt-${idx}" style="color:#f4f4f5;">${n.text}</div>`;
           list.appendChild(d);
         });
       } else if (currentView === "decisions") {
@@ -516,10 +516,24 @@
       { speaker: "ATTENDEES", time: "00:02", audio: "audio/turn_0.mp3", text: "All right team, we need to finalize our database and caching tier before the v2 release. Are we sticking with Redis?", event: null },
       { speaker: "YOU", time: "00:09", audio: "audio/turn_1.mp3", text: "I thought we agreed to hold off on Redis until Schema v2 lands to avoid unnecessary memory overhead.", event: null },
       { speaker: "ATTENDEES", time: "00:16", audio: "audio/turn_2.mp3", text: "Wait, what did we decide about the GraphQL caching strategy last month?", event: "rag" },
-      { speaker: "ATTENDEES", time: "00:21", audio: "audio/turn_3.mp3", text: "Got it, makes total sense. Let's deploy the Kubernetes cluster with an NGINX ingress controller hooked up to PostgreSQL.", event: "decision" },
-      { speaker: "ATTENDEES", time: "00:29", audio: "audio/turn_4.mp3", text: "Devanshu, can you update the ADR documentation and sync with the DevOps team by tomorrow morning?", event: "action" },
-      { speaker: "YOU", time: "00:35", audio: "audio/turn_5.mp3", text: "On it. I'll export the meeting minutes and share the updated ADR with the infra squad.", event: null }
+      { speaker: "YOU", time: "00:21", audio: "audio/reply_graphql.mp3", text: "For GraphQL Caching, we decided to hold off on Redis until Schema v2 lands to avoid memory overhead.", event: null },
+      { speaker: "ATTENDEES", time: "00:27", audio: "audio/turn_3.mp3", text: "Got it, makes total sense. Let's deploy the Kubernetes cluster with an NGINX ingress controller hooked up to PostgreSQL.", event: "decision" },
+      { speaker: "ATTENDEES", time: "00:35", audio: "audio/turn_4.mp3", text: "Devanshu, can you update the ADR documentation and sync with the DevOps team by tomorrow morning?", event: "action" },
+      { speaker: "YOU", time: "00:41", audio: "audio/turn_5.mp3", text: "On it. I'll export the meeting minutes and share the updated ADR with the infra squad.", event: null }
     ];
+
+    function updateNoteInPlace(idx, txt) {
+      notes[idx].text = txt;
+      if (currentView !== "capture") return;
+      const el = document.getElementById("note-txt-" + idx);
+      if (el) {
+        el.textContent = txt;
+        const list = document.getElementById("stream-list");
+        list.scrollTop = list.scrollHeight;
+      } else {
+        renderStream();
+      }
+    }
 
     function updateInsights() {
       const latest = notes.length ? notes[notes.length - 1].text.slice(0, 68) + "..." : "Listening...";
@@ -554,18 +568,18 @@
 
       const item = demoScript[idx];
       const words = item.text.split(" ");
-      const noteObj = { speaker: item.speaker, time: item.time, text: "" };
-      notes.push(noteObj);
+      const noteIdx = notes.length;
+      notes.push({ speaker: item.speaker, time: item.time, text: "" });
       waveEnergy = item.speaker === "YOU" ? 0.78 : 0.72;
-      renderStream();
+      if (currentView === "capture") renderStream();
 
       const finishTurn = () => {
         if (runId !== simRunId) return;
-        noteObj.text = item.text;
+        updateNoteInPlace(noteIdx, item.text);
         waveEnergy = 0.08;
-        renderStream();
         fireTurnEvent(item.event, item.text);
-        simTimers.push(setTimeout(() => playTurn(idx + 1, runId), 650));
+        const pauseMs = item.event === "rag" ? 1150 : 650;
+        simTimers.push(setTimeout(() => playTurn(idx + 1, runId), pauseMs));
       };
 
       if (useVoice) {
@@ -577,15 +591,12 @@
           const span = Math.max(0.5, audio.duration - 0.26);
           const count = Math.min(words.length, Math.max(1, Math.floor((elapsed / span) * words.length)));
           if (audio.currentTime >= 0.22) {
-            noteObj.text = words.slice(0, count).join(" ") + (count < words.length ? "..." : "");
-            renderStream();
+            updateNoteInPlace(noteIdx, words.slice(0, count).join(" ") + (count < words.length ? "..." : ""));
           }
         });
         audio.addEventListener("ended", finishTurn);
         audio.play().catch(() => {
-          // Autoplay fallback if blocked: run timed fallback
-          noteObj.text = item.text;
-          renderStream();
+          updateNoteInPlace(noteIdx, item.text);
           simTimers.push(setTimeout(finishTurn, 3200));
         });
       } else {
@@ -597,8 +608,7 @@
             clearInterval(iv);
             finishTurn();
           } else {
-            noteObj.text = words.slice(0, step).join(" ") + "...";
-            renderStream();
+            updateNoteInPlace(noteIdx, words.slice(0, step).join(" ") + "...");
           }
         }, 320);
       }

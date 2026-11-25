@@ -112,7 +112,8 @@ def prepare_demo_audio(script: list, cache_dir: str) -> list:
 
         async def _synth_all():
             for idx, item in enumerate(script):
-                out_file = os.path.join(cache_dir, f"turn_{idx}.mp3")
+                fname = item.get("cache_name", f"turn_{idx}.mp3")
+                out_file = os.path.join(cache_dir, fname)
                 if not os.path.exists(out_file) or os.path.getsize(out_file) < 512:
                     voice = "en-US-BrianNeural" if item["speaker"] == "YOU" else "en-US-AndrewNeural"
                     comm = edge_tts.Communicate(item["text"], voice)
@@ -195,21 +196,31 @@ def run_demo():
             "speaker": "ATTENDEES",
             "text": "Wait, what did we decide about the GraphQL caching strategy last month?",
             "event": "rag_nudge",
+            "cache_name": "turn_2.mp3",
+        },
+        {
+            "speaker": "YOU",
+            "text": "For GraphQL Caching, we decided to hold off on Redis until Schema v2 lands to avoid memory overhead.",
+            "event": None,
+            "cache_name": "reply_graphql.mp3",
         },
         {
             "speaker": "ATTENDEES",
             "text": "Got it, makes total sense. Let's deploy the Kubernetes cluster with an NGINX ingress controller hooked up to PostgreSQL.",
             "event": "decision",
+            "cache_name": "turn_3.mp3",
         },
         {
             "speaker": "ATTENDEES",
             "text": "Devanshu, can you update the ADR documentation and sync with the DevOps team by tomorrow morning?",
             "event": "commitment",
+            "cache_name": "turn_4.mp3",
         },
         {
             "speaker": "YOU",
             "text": "On it. I'll export the meeting minutes and share the updated ADR with the infra squad.",
             "event": None,
+            "cache_name": "turn_5.mp3",
         },
     ]
 
