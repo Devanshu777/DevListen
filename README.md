@@ -12,26 +12,39 @@ Try the interactive HUD, **Bi-Temporal Decision Graph**, and **Local Vector RAG*
 
 ---
 
-### 🏗️ Architectural Flow & Why It Is Engineered This Way
+### 🏗️ Layered System Architecture (5 Decoupled Layers)
 
 ```mermaid
-flowchart LR
-    MIC["User Mic (44.1/48kHz)"] -->|"WebRTC + Silero Dual-VAD"| RT["RealtimeSTT (tiny + base)"]
-    LB["WASAPI Loopback (Zoom/Teams/Meet/Webex)"] -->|"16kHz Sinc Resample"| LT["LocalTranscriber (faster-whisper INT8 + 400ms Overlap)"]
+flowchart TB
+    subgraph L1["Layer 1: OS Audio & Hardware Ingestion"]
+        MIC["User Mic (44.1/48kHz)"] -->|"WebRTC VAD + RingBuffer"| RES1["16kHz Mono PCM"]
+        LB["WASAPI Loopback (Zoom/Teams/Meet/Webex)"] -->|"Polyphase Sinc Resample"| RES2["16kHz Mono PCM"]
+    end
 
-    RT -->|"YOU (Sub-100ms)"| AGG["Conversational Turn Aggregator (N-gram Deduplication)"]
-    LT -->|"ATTENDEES"| AGG
+    subgraph L2["Layer 2: Edge Streaming ASR & Turn Aggregation"]
+        RES1 -->|"Sub-100ms"| RT["RealtimeSTT (tiny + base)"]
+        RES2 -->|"400ms Acoustic Overlap"| LT["faster-whisper (CTranslate2 INT8)"]
+        RT -->|"YOU"| AGG["ConversationalTurnAggregator (1-5 Word N-gram Dedupe)"]
+        LT -->|"ATTENDEES"| AGG
+    end
 
-    AGG -->|"Cohesive Paragraphs"| HUD["DevListen Studio HUD (PySide6 + WDA_EXCLUDEFROMCAPTURE)"]
-    AGG -->|"Autonomous NLP"| EXT["Decision & Commitment Extractors"]
-    AGG -->|"Spoken Questions"| QD["Real-Time Question Detector"]
+    subgraph L3["Layer 3: Cognitive NLP & Bi-Temporal GraphRAG"]
+        AGG --> EXT["DecisionExtractor + CommitmentExtractor"]
+        AGG --> QD["QuestionDetector"]
+        EXT -->|"ACTIVE / SUPERSEDED Lineage"| GRAPH["TemporalDecisionGraph"]
+        GRAPH -->|"384-d ONNX Embeddings"| VEC["fastembed (BAAI/bge-small-en-v1.5)"]
+        QD -->|"Sub-10ms Cosine Search"| VEC
+    end
 
-    EXT -->|"ACTIVE / SUPERSEDED Lineage"| GRAPH["Bi-Temporal Knowledge Graph"]
-    GRAPH -->|"384-d ONNX Embeddings"| VEC["fastembed (BAAI/bge-small-en-v1.5)"]
-    QD -->|"Sub-10ms Cosine Search"| VEC
-    VEC -->|"Natural Suggested Response"| HUD
+    subgraph L4["Layer 4: Zero-Trust Persistence"]
+        AGG -->|"DPAPI + AES-256-GCM"| VAULT["Encrypted SQLite WAL Vault"]
+        VAULT --> EXP["Markdown ADR Exporter"]
+    end
 
-    AGG -->|"DPAPI + AES-256-GCM"| VAULT["Encrypted SQLite WAL Vault"]
+    subgraph L5["Layer 5: Hardware-Stealth Presentation"]
+        VEC -->|"Natural Suggested Reply"| HUD["DevListen Studio (PySide6 + WDA_EXCLUDEFROMCAPTURE 0x11)"]
+        AGG --> HUD
+    end
 ```
 
 #### Why This Architecture Is Faster, Cleaner & More Efficient:
