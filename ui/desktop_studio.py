@@ -263,7 +263,7 @@ class DevListenStudio(QWidget):
         root = QVBoxLayout(self)
         root.setContentsMargins(6, 6, 6, 6)
 
-        self.setFont(QFont("Inter", 10))
+        self.setFont(QFont("Segoe UI Variable Text", 10))
 
         # Outer Obsidian Window Shell
         self.shell = QFrame(self)
@@ -273,10 +273,10 @@ class DevListenStudio(QWidget):
                 background-color: #09090B;
                 border: 1px solid rgba(255, 255, 255, 0.10);
                 border-radius: 14px;
-                font-family: 'Inter', 'Segoe UI Variable Text', 'Segoe UI', sans-serif;
+                font-family: 'Segoe UI Variable Text', 'Segoe UI', 'Inter', sans-serif;
             }
             QLabel, QPushButton, QLineEdit, QComboBox {
-                font-family: 'Inter', 'Segoe UI Variable Text', 'Segoe UI', sans-serif;
+                font-family: 'Segoe UI Variable Text', 'Segoe UI', 'Inter', sans-serif;
             }
         """)
         shell_layout = QVBoxLayout(self.shell)
@@ -516,9 +516,9 @@ class DevListenStudio(QWidget):
 
         meta_row = QHBoxLayout()
         self.wav_name_lbl = QLabel("Live_Meeting_Active.wav", wave_card)
-        self.wav_name_lbl.setStyleSheet("color: #A1A1AA; font-family: 'Consolas', monospace; font-size: 11px; border: none;")
+        self.wav_name_lbl.setStyleSheet("color: #A1A1AA; font-size: 11px; border: none;")
         self.wave_timer_lbl = QLabel("00:00  /  LIVE", wave_card)
-        self.wave_timer_lbl.setStyleSheet("color: #E4E4E7; font-family: 'Consolas', monospace; font-size: 11px; border: none;")
+        self.wave_timer_lbl.setStyleSheet("color: #E4E4E7; font-size: 11px; border: none;")
         live_dot = QLabel("● REC", wave_card)
         live_dot.setStyleSheet("color: #EF4444; font-size: 10px; font-weight: 700; border: none;")
         meta_row.addWidget(self.wav_name_lbl)
@@ -542,7 +542,7 @@ class DevListenStudio(QWidget):
             ("🔊 16kHz Mono PCM", "#A1A1AA"),
         ):
             lbl = QLabel(txt, diag_pill)
-            lbl.setStyleSheet(f"color: {col}; font-family: 'Consolas', monospace; font-size: 10.5px; border: none;")
+            lbl.setStyleSheet(f"color: {col}; font-size: 10.5px; border: none;")
             dlay.addWidget(lbl)
         diag_row.addStretch()
         diag_row.addWidget(diag_pill)
@@ -661,7 +661,7 @@ class DevListenStudio(QWidget):
                 border: 1px solid rgba(6, 182, 212, 0.22);
                 border-radius: 9px;
                 padding: 10px;
-                font-family: 'Inter', 'Segoe UI Variable Text', 'Segoe UI', sans-serif;
+                font-family: 'Segoe UI Variable Text', 'Segoe UI', 'Inter', sans-serif;
                 font-size: 12px;
                 line-height: 1.5;
             }
@@ -686,7 +686,7 @@ class DevListenStudio(QWidget):
                 border: 1px solid rgba(255, 255, 255, 0.08);
                 border-radius: 8px;
                 padding: 8px;
-                font-family: 'Consolas', 'JetBrains Mono', monospace;
+                font-family: 'Cascadia Code', 'Consolas', monospace;
                 font-size: 10.5px;
             }
         """)
@@ -801,7 +801,7 @@ class DevListenStudio(QWidget):
         rh.setStyleSheet("color: #FAFAFA; font-size: 13px; font-weight: 700; border: none;")
         self.md_preview = QTextEdit(right)
         self.md_preview.setReadOnly(True)
-        self.md_preview.setStyleSheet("QTextEdit { background: #09090D; color: #E4E4E7; border: 1px solid rgba(255,255,255,0.07); border-radius: 8px; padding: 10px; font-family: 'Consolas', monospace; font-size: 11px; }")
+        self.md_preview.setStyleSheet("QTextEdit { background: #09090D; color: #E4E4E7; border: 1px solid rgba(255,255,255,0.07); border-radius: 8px; padding: 10px; font-size: 11px; }")
         self.md_preview.setPlainText("# DevListen Meeting Brief\n\n- Engine: 100% Offline\n- Decisions & Action Items sync live here.")
         rl.addWidget(rh)
         rl.addWidget(self.md_preview)
@@ -878,7 +878,7 @@ class DevListenStudio(QWidget):
             "• Ctrl + MouseWheel        —  Adjust Window Opacity",
             card
         )
-        hotkeys_lbl.setStyleSheet("color: #D4D4D8; font-family: 'Consolas', monospace; font-size: 11px; border: none; padding-top: 8px;")
+        hotkeys_lbl.setStyleSheet("color: #D4D4D8; font-size: 11px; border: none; padding-top: 8px;")
         cl.addWidget(hotkeys_lbl)
         lay.addWidget(card)
         lay.addStretch()
@@ -898,7 +898,7 @@ class DevListenStudio(QWidget):
         lay = QHBoxLayout(bar)
         lay.setContentsMargins(14, 0, 14, 0)
         self.status_lbl = QLabel("Local Engine: faster-whisper INT8  |  Vector RAG: BGE-Small ONNX  |  Latency: <190ms  |  Vault: Encrypted WAL", bar)
-        self.status_lbl.setStyleSheet("color: #71717A; font-family: 'Consolas', monospace; font-size: 10px; border: none;")
+        self.status_lbl.setStyleSheet("color: #71717A; font-size: 10px; border: none;")
         lay.addWidget(self.status_lbl)
         lay.addStretch()
         return bar
@@ -995,7 +995,7 @@ class DevListenStudio(QWidget):
             pill = QLabel(f" {spk} ", card)
             pill.setStyleSheet(f"background: {pill_bg}; color: {accent}; font-weight: 700; font-size: 10px; border-radius: 4px; padding: 2px 6px; border: none;")
             ts = QLabel(now_time, card)
-            ts.setStyleSheet("color: #71717A; font-family: 'Consolas', monospace; font-size: 10px; border: none;")
+            ts.setStyleSheet("color: #71717A; font-size: 10px; border: none;")
             hdr.addWidget(pill)
             hdr.addWidget(ts)
             hdr.addStretch()
