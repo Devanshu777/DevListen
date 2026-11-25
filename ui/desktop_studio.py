@@ -1054,18 +1054,45 @@ class DevListenStudio(QWidget):
         animate_fade_in(self.nudge_frame, duration_ms=220)
         QTimer.singleShot(11000, lambda: self.nudge_frame.setVisible(False))
 
-        # Populate the Right-Hand Suggested Response Box from historical RAG context
-        plain = re.sub(r'<[^>]+>', ' ', html_content)
-        plain = re.sub(r'\s+', ' ', plain).strip()
+        # Synthesize a natural, human-like spoken response from Bi-Temporal RAG context
+        plain = re.sub(r'<[^>]+>', '\n', html_content)
+        lines = [re.sub(r'\s+', ' ', ln).strip() for ln in plain.splitlines() if ln.strip()]
+
+        entity = ""
+        current_truth = ""
+        prior_item = ""
+        mode = None
+        for ln in lines:
+            if "CURRENT TRUTH" in ln:
+                mode = "curr"
+            elif "PRIOR HISTORY" in ln:
+                mode = "prior"
+            elif not entity and "No recorded decisions" not in ln:
+                entity = ln
+            elif mode == "curr" and not current_truth:
+                current_truth = ln.lstrip("•- ").rstrip(".")
+            elif mode == "prior" and not prior_item:
+                prior_item = ln.replace("[SUPERSEDED]", "").strip().lstrip("•- ").rstrip(".")
+
+        if current_truth:
+            lc_curr = current_truth[0].lower() + current_truth[1:] if len(current_truth) > 1 else current_truth.lower()
+            spoken = f"For <b>{entity}</b>, we decided to {lc_curr}."
+            if prior_item:
+                lc_prior = prior_item[0].lower() + prior_item[1:] if len(prior_item) > 1 else prior_item.lower()
+                spoken += f" (Our earlier plan was to {lc_prior}, but we superseded that.)"
+        else:
+            fallback = " ".join(lines)
+            spoken = fallback if fallback else "No prior decisions matched this question yet."
+
         self.suggestion_box.setHtml(
             f"<div style='color:#22D3EE; font-weight:700; font-size:11px; margin-bottom:6px;'>"
             f"💬 SUGGESTED RESPONSE</div>"
             f"<div style='color:#A1A1AA; font-size:10.5px; margin-bottom:8px;'>"
             f"<b>Asked:</b> \"{trimmed}\"</div>"
-            f"<div style='color:#F4F4F5; font-size:12px; background:rgba(6,182,212,0.08); "
-            f"border-left:3px solid #06B6D4; padding:8px; border-radius:4px; margin-bottom:8px;'>"
-            f"\"Based on our recorded meeting history: {plain}\"</div>"
-            f"<div style='color:#71717A; font-size:10px;'>Grounded by Bi-Temporal Knowledge Graph (100% Offline)</div>"
+            f"<div style='color:#F4F4F5; font-size:12.5px; line-height:1.55; background:rgba(6,182,212,0.08); "
+            f"border-left:3px solid #06B6D4; padding:10px; border-radius:6px; margin-bottom:8px;'>"
+            f"\"{spoken}\"</div>"
+            f"<div style='color:#71717A; font-size:10px;'>Grounded by Bi-Temporal Knowledge Graph • Ready to speak</div>"
         )
 
     def _handle_search(self):
