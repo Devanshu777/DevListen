@@ -1,0 +1,732 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>DevListen — 100% Offline Edge AI Meeting Copilot & Bi-Temporal Knowledge Graph</title>
+  <style>
+    :root {
+      --bg: #07080c;
+      --surface: rgba(15, 17, 24, 0.96);
+      --surface-light: rgba(255, 255, 255, 0.035);
+      --border: rgba(255, 255, 255, 0.08);
+      --text: #f8fafc;
+      --muted: #94a3b8;
+      --dim: #64748b;
+      --emerald: #10b981;
+      --iris: #818cf8;
+      --amber: #f59e0b;
+      --rose: #f43f5e;
+      --sky: #38bdf8;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI Variable Text", "Inter", sans-serif;
+      background: radial-gradient(circle at 15% 10%, rgba(129, 140, 248, 0.12), transparent 40%),
+                  radial-gradient(circle at 85% 20%, rgba(16, 185, 129, 0.09), transparent 35%),
+                  var(--bg);
+      color: var(--text);
+      line-height: 1.55;
+      min-height: 100vh;
+    }
+    .container {
+      max-width: 1180px;
+      margin: 0 auto;
+      padding: 28px 20px 64px;
+    }
+    /* Hero */
+    .hero {
+      display: grid;
+      grid-template-columns: 1.05fr 0.95fr;
+      gap: 36px;
+      align-items: start;
+    }
+    @media (max-width: 920px) {
+      .hero { grid-template-columns: 1fr; }
+    }
+    .eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--emerald);
+      background: rgba(16, 185, 129, 0.1);
+      border: 1px solid rgba(16, 185, 129, 0.25);
+      padding: 5px 12px;
+      border-radius: 999px;
+      margin-bottom: 16px;
+    }
+    .dot-pulse {
+      width: 7px; height: 7px; border-radius: 50%; background: var(--emerald);
+      box-shadow: 0 0 8px var(--emerald);
+      animation: pulse 1.8s infinite;
+    }
+    @keyframes pulse { 0%,100% { opacity: 1; } 50% { opacity: 0.35; } }
+    h1 {
+      font-size: clamp(28px, 4vw, 44px);
+      font-weight: 800;
+      letter-spacing: -0.03em;
+      line-height: 1.12;
+      margin-bottom: 16px;
+      background: linear-gradient(135deg, #ffffff 30%, #94a3b8 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    .subtitle {
+      color: var(--muted);
+      font-size: 15.5px;
+      margin-bottom: 22px;
+      max-width: 560px;
+    }
+    .badge-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-bottom: 24px;
+    }
+    .tech-badge {
+      font-size: 11px;
+      font-weight: 600;
+      color: #cbd5e1;
+      background: rgba(255,255,255,0.045);
+      border: 1px solid var(--border);
+      padding: 4px 10px;
+      border-radius: 6px;
+    }
+    .cta-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin-bottom: 28px;
+    }
+    .btn-primary {
+      background: linear-gradient(135deg, #10b981, #059669);
+      color: #03150e;
+      font-weight: 700;
+      font-size: 13px;
+      border: none;
+      padding: 11px 18px;
+      border-radius: 10px;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      transition: transform 0.15s ease, box-shadow 0.15s ease;
+    }
+    .btn-primary:hover { transform: translateY(-1px); box-shadow: 0 8px 24px rgba(16, 185, 129, 0.25); }
+    .btn-secondary {
+      background: rgba(255,255,255,0.05);
+      color: var(--text);
+      font-weight: 600;
+      font-size: 13px;
+      border: 1px solid var(--border);
+      padding: 11px 16px;
+      border-radius: 10px;
+      cursor: pointer;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .btn-secondary:hover { background: rgba(255,255,255,0.09); }
+
+    /* Metrics Strip */
+    .metrics {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+    }
+    .metric-box {
+      background: var(--surface-light);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 12px;
+    }
+    .metric-val { font-size: 18px; font-weight: 800; color: var(--text); }
+    .metric-lbl { font-size: 11px; color: var(--muted); }
+
+    /* Interactive HUD Simulator */
+    .hud-shell {
+      background: var(--surface);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 16px;
+      padding: 16px;
+      box-shadow: 0 24px 70px rgba(0, 0, 0, 0.65), 0 0 0 1px rgba(255,255,255,0.03);
+      display: flex;
+      flex-direction: column;
+      height: 620px;
+      position: relative;
+    }
+    .hud-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 10px;
+    }
+    .hud-brand {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 13px;
+      font-weight: 700;
+    }
+    .hud-pill {
+      font-size: 10px;
+      font-weight: 600;
+      padding: 2px 7px;
+      border-radius: 5px;
+      background: rgba(255,255,255,0.05);
+      border: 1px solid rgba(255,255,255,0.06);
+      color: var(--muted);
+    }
+    .tier-pill {
+      color: #a78bfa;
+      background: rgba(167,139,250,0.1);
+      border-color: rgba(167,139,250,0.22);
+    }
+    .vu-group {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .vu-track {
+      width: 28px; height: 4px; border-radius: 2px;
+      background: rgba(255,255,255,0.08);
+      overflow: hidden;
+    }
+    .vu-fill-mic { height: 100%; width: 0%; background: var(--emerald); transition: width 0.2s; }
+    .vu-fill-call { height: 100%; width: 0%; background: var(--iris); transition: width 0.2s; }
+
+    /* Toast Nudge */
+    .nudge-toast {
+      display: none;
+      background: rgba(245, 158, 11, 0.08);
+      border: 1px solid rgba(245, 158, 11, 0.22);
+      border-left: 3px solid var(--amber);
+      border-radius: 8px;
+      padding: 9px 11px;
+      margin-bottom: 10px;
+      font-size: 11px;
+      animation: fadeSlide 0.25s ease;
+    }
+    @keyframes fadeSlide { from { opacity: 0; transform: translateY(-4px); } to { opacity: 1; transform: translateY(0); } }
+
+    /* Segmented Capsule Tabs */
+    .tab-capsule {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 3px;
+      background: rgba(255,255,255,0.035);
+      border: 1px solid rgba(255,255,255,0.06);
+      border-radius: 8px;
+      padding: 3px;
+      margin-bottom: 10px;
+    }
+    .tab-btn {
+      background: transparent;
+      border: none;
+      color: var(--muted);
+      font-size: 11px;
+      font-weight: 600;
+      padding: 6px 8px;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+    .tab-btn.active {
+      background: rgba(255,255,255,0.1);
+      color: #fff;
+    }
+
+    /* Stream Area */
+    .hud-body {
+      flex: 1;
+      overflow-y: auto;
+      padding-right: 4px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .hud-body::-webkit-scrollbar { width: 4px; }
+    .hud-body::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.15); border-radius: 2px; }
+
+    .stream-card {
+      border-radius: 8px;
+      padding: 10px 12px;
+      font-size: 12.5px;
+      animation: fadeSlide 0.2s ease;
+    }
+    .card-attendees {
+      background: rgba(129, 140, 248, 0.045);
+      border: 1px solid rgba(129, 140, 248, 0.16);
+      border-left: 3px solid var(--iris);
+    }
+    .card-you {
+      background: rgba(16, 185, 129, 0.045);
+      border: 1px solid rgba(16, 185, 129, 0.16);
+      border-left: 3px solid var(--emerald);
+    }
+    .card-decision {
+      background: rgba(255,255,255,0.025);
+      border: 1px solid rgba(255,255,255,0.06);
+      border-left: 3px solid var(--emerald);
+      border-radius: 8px;
+      padding: 10px 12px;
+      font-size: 12px;
+    }
+    .card-decision.superseded { border-left-color: var(--rose); opacity: 0.82; }
+    .card-action {
+      background: rgba(255,255,255,0.025);
+      border: 1px solid rgba(255,255,255,0.06);
+      border-left: 3px solid var(--amber);
+      border-radius: 8px;
+      padding: 10px 12px;
+      font-size: 12px;
+    }
+    .spk-badge {
+      display: inline-block;
+      font-size: 9px;
+      font-weight: 700;
+      padding: 1px 6px;
+      border-radius: 3px;
+      letter-spacing: 0.4px;
+      margin-right: 6px;
+    }
+    .badge-attendees { background: rgba(129,140,248,0.15); color: var(--iris); }
+    .badge-you { background: rgba(16,185,129,0.15); color: var(--emerald); }
+    .badge-active { background: rgba(16,185,129,0.15); color: var(--emerald); }
+    .badge-superseded { background: rgba(244,63,94,0.15); color: var(--rose); }
+    .badge-assignee { background: rgba(245,158,11,0.15); color: var(--amber); }
+
+    .hud-search {
+      margin-top: 10px;
+      width: 100%;
+      background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 8px;
+      padding: 9px 12px;
+      color: var(--text);
+      font-size: 11.5px;
+      outline: none;
+    }
+    .hud-search:focus { border-color: var(--iris); }
+    .hud-footer {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: 8px;
+      font-size: 10.5px;
+      color: var(--dim);
+    }
+
+    /* Architecture Section */
+    .section { margin-top: 56px; }
+    .section-title {
+      font-size: 22px;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      margin-bottom: 8px;
+    }
+    .section-sub { color: var(--muted); font-size: 14px; margin-bottom: 24px; }
+    .arch-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 16px;
+    }
+    .arch-card {
+      background: var(--surface-light);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 18px;
+    }
+    .arch-card h3 {
+      font-size: 14px;
+      font-weight: 700;
+      margin-bottom: 8px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .arch-card p { font-size: 12.5px; color: var(--muted); }
+    .hint-chips {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-top: 8px;
+    }
+    .chip {
+      font-size: 10.5px;
+      color: var(--iris);
+      background: rgba(129, 140, 248, 0.1);
+      border: 1px solid rgba(129, 140, 248, 0.2);
+      padding: 2px 8px;
+      border-radius: 999px;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="hero">
+      <div>
+        <div class="eyebrow"><span class="dot-pulse"></span> 100% Offline Edge AI • Zero Cloud Leaks</div>
+        <h1>DevListen: Real-Time Edge Meeting Copilot &amp; Bi-Temporal Knowledge Graph</h1>
+        <p class="subtitle">
+          A privacy-first, hardware-stealth desktop AI copilot that captures dual-stream meeting audio locally,
+          indexes architectural decisions into a <strong>Bi-Temporal Knowledge Graph</strong>, and surfaces
+          <strong>Zero-Click Local Vector RAG</strong> nudges in under 10ms—completely invisible to screen shares.
+        </p>
+
+        <div class="badge-row">
+          <span class="tech-badge">faster-whisper (INT8 CPU)</span>
+          <span class="tech-badge">RealtimeSTT (Dual-VAD)</span>
+          <span class="tech-badge">ONNX Vector RAG (BGE-Small)</span>
+          <span class="tech-badge">Bi-Temporal Graph</span>
+          <span class="tech-badge">WASAPI Loopback</span>
+          <span class="tech-badge">AES-256-GCM + DPAPI</span>
+          <span class="tech-badge">Win32 Stealth HUD</span>
+        </div>
+
+        <div class="cta-row">
+          <button class="btn-primary" onclick="startSimulation()">▶ Play Live Meeting Simulation</button>
+          <a class="btn-secondary" href="#architecture">View System Architecture ↓</a>
+        </div>
+
+        <div class="metrics">
+          <div class="metric-box">
+            <div class="metric-val">&lt; 190ms</div>
+            <div class="metric-lbl">INT8 Whisper CPU Latency</div>
+          </div>
+          <div class="metric-box">
+            <div class="metric-val">&lt; 10ms</div>
+            <div class="metric-lbl">384-d ONNX Vector Search</div>
+          </div>
+          <div class="metric-box">
+            <div class="metric-val">0 Bytes</div>
+            <div class="metric-lbl">Sent to External Cloud APIs</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Interactive HUD Twin -->
+      <div class="hud-shell">
+        <div class="hud-header">
+          <div class="hud-brand">
+            <span class="dot-pulse"></span>
+            <span>DevListen</span>
+            <span class="hud-pill" id="hud-timer">00:00</span>
+            <span class="hud-pill tier-pill">INT8 CPU</span>
+          </div>
+          <div class="vu-group">
+            <span style="font-size:9px;color:var(--emerald);">●</span>
+            <div class="vu-track"><div class="vu-fill-mic" id="vu-mic"></div></div>
+            <span style="font-size:9px;color:var(--iris);">●</span>
+            <div class="vu-track"><div class="vu-fill-call" id="vu-call"></div></div>
+          </div>
+        </div>
+
+        <div class="nudge-toast" id="nudge-toast"></div>
+
+        <div class="tab-capsule">
+          <button class="tab-btn active" id="tab-notes" onclick="switchTab('notes')">Notes</button>
+          <button class="tab-btn" id="tab-decisions" onclick="switchTab('decisions')">Decisions (<span id="dec-count">2</span>)</button>
+          <button class="tab-btn" id="tab-actions" onclick="switchTab('actions')">Actions (<span id="act-count">0</span>)</button>
+        </div>
+
+        <div class="hud-body" id="hud-body"></div>
+
+        <input class="hud-search" id="hud-search" placeholder="Try Local Vector Search: 'Redis', 'Kubernetes', 'OAuth2' + Enter" onkeydown="if(event.key==='Enter') runQuery(this.value)" />
+        <div class="hint-chips">
+          <span style="font-size:10.5px;color:var(--dim);padding-top:2px;">Quick RAG queries:</span>
+          <span class="chip" onclick="runQuery('database caching plan')">database caching plan</span>
+          <span class="chip" onclick="runQuery('Kubernetes')">Kubernetes</span>
+          <span class="chip" onclick="runQuery('OAuth2')">OAuth2</span>
+        </div>
+        <div class="hud-footer">
+          <span>🔒 Encrypted SQLite WAL • Screen-Share Invisible</span>
+          <span id="sim-status">Ready — Press Play</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="section" id="architecture">
+      <h2 class="section-title">Production &amp; Organization-Level Architecture</h2>
+      <p class="section-sub">Engineered to solve real-world edge latency, memory drift, and enterprise confidentiality.</p>
+      <div class="arch-grid">
+        <div class="arch-card">
+          <h3>🎙️ Dual-Stream Edge ASR</h3>
+          <p>Separates your microphone (<code>RealtimeSTT</code> dual-VAD sub-100ms streaming) from remote attendees (<code>WASAPI Loopback</code> + <code>faster-whisper</code> INT8). Uses a <strong>400ms acoustic boundary overlap</strong> and N-gram deduplication so fast speakers never lose boundary words.</p>
+        </div>
+        <div class="arch-card">
+          <h3>🧠 Bi-Temporal Knowledge Graph</h3>
+          <p>Tracks technical decisions with chronological state decay (<code>ACTIVE</code> vs <code>SUPERSEDED</code>). When a new architecture choice overrides an older one, the graph preserves lineage so RAG never surfaces stale truth.</p>
+        </div>
+        <div class="arch-card">
+          <h3>⚡ Zero-Click Local Vector RAG</h3>
+          <p>Embeds decisions using <code>BAAI/bge-small-en-v1.5</code> (384-d ONNX via <code>fastembed</code>). Detects spoken questions in real time and surfaces context flashcards in &lt;10ms without touching the keyboard.</p>
+        </div>
+        <div class="arch-card">
+          <h3>🛡️ Zero-Trust Vault &amp; Stealth HUD</h3>
+          <p>Transcripts are encrypted at rest via Windows DPAPI + <strong>AES-256-GCM</strong> in SQLite WAL mode. The PySide6 HUD enforces Win32 <code>WDA_EXCLUDEFROMCAPTURE</code> so it stays 100% invisible on Zoom/Teams/OBS screen shares.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="section" id="decisions-roadmap">
+      <h2 class="section-title">Engineering Trade-offs: Modern Edge AI vs. Old-School Tech</h2>
+      <p class="section-sub">Key architectural decisions made to eliminate latency, hallucination, and privacy leaks.</p>
+      <div class="arch-grid">
+        <div class="arch-card">
+          <h3>⚡ Dual-Stream + 400ms Overlap vs. Naive VAD Chunking</h3>
+          <p><strong>Old-School:</strong> Hard-chopping audio at fixed 2s intervals with Silero VAD drops unstressed words on fast speakers.<br><strong>DevListen:</strong> Dual-stream separation (<code>YOU</code> vs <code>ATTENDEES</code>) + 400ms acoustic boundary overlap &amp; N-gram deduplication preserves 100% of boundary syllables.</p>
+        </div>
+        <div class="arch-card">
+          <h3>🕒 Bi-Temporal Graph vs. Flat Vector RAG</h3>
+          <p><strong>Old-School:</strong> Flat vector DBs retrieve deprecated decisions alongside current ones, causing contradictions.<br><strong>DevListen:</strong> Models <code>ACTIVE</code> vs <code>SUPERSEDED</code> state lineage so RAG always surfaces current architectural truth.</p>
+        </div>
+        <div class="arch-card">
+          <h3>🔐 Local ONNX + INT8 vs. Cloud APIs</h3>
+          <p><strong>Old-School:</strong> Streaming corporate audio to external APIs creates compliance risk and 600ms+ network jitter.<br><strong>DevListen:</strong> Runs <code>faster-whisper</code> INT8 + <code>BGE-Small</code> ONNX locally in &lt;190ms with zero bytes leaving the device.</p>
+        </div>
+      </div>
+
+      <h2 class="section-title" style="margin-top:42px;">Active Engineering Roadmap (What We're Building Next)</h2>
+      <p class="section-sub">Current R&amp;D milestones to evolve DevListen into a full autonomous edge agent.</p>
+      <div class="arch-grid">
+        <div class="arch-card">
+          <h3>🦙 Local Quantized LLM Synthesis</h3>
+          <p>Integrating 4-bit quantized <code>Qwen2.5-3B</code> / <code>Phi-3.5</code> via <code>llama.cpp</code> for abstractive executive summaries and automatic ADR (Architecture Decision Record) PR generation offline.</p>
+        </div>
+        <div class="arch-card">
+          <h3>🎯 Hybrid Cross-Encoder Reranking</h3>
+          <p>Adding a lightweight local ONNX cross-encoder reranker over top-K bi-temporal graph nodes to boost precision on multi-constraint technical queries.</p>
+        </div>
+        <div class="arch-card">
+          <h3>🎛️ Multi-Channel SDK Diarization</h3>
+          <p>Optional Zoom/Teams local SDK audio track hooks for deterministic per-attendee channel isolation without heuristic clustering drift.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    let currentTab = "notes";
+    let simTimers = [];
+    let clockInterval = null;
+    let secondsElapsed = 0;
+
+    const notes = [];
+    const decisions = [
+      {
+        entity: "GraphQL Caching",
+        status: "ACTIVE",
+        summary: "Hold off on Redis until Schema v2 lands to avoid memory overhead.",
+        meta: "Proposed by You • Decided by Team"
+      },
+      {
+        entity: "GraphQL Caching",
+        status: "SUPERSEDED",
+        summary: "Use Redis for response caching across all endpoints.",
+        meta: "Proposed by Alex • Superseded by Schema v2 decision"
+      }
+    ];
+    const actions = [];
+
+    const vectorKB = [
+      {
+        keys: ["redis", "cache", "caching", "database", "memory"],
+        entity: "GraphQL Caching",
+        score: "0.84",
+        active: "Hold off on Redis until Schema v2 lands to avoid memory overhead.",
+        prior: "Use Redis for response caching across all endpoints."
+      },
+      {
+        keys: ["kubernetes", "k8s", "nginx", "ingress", "postgres"],
+        entity: "Kubernetes Ingress",
+        score: "0.79",
+        active: "Deployed Kubernetes with NGINX ingress controller backed by PostgreSQL.",
+        prior: null
+      },
+      {
+        keys: ["oauth", "oauth2", "jwt", "auth", "grpc"],
+        entity: "Auth & Transport",
+        score: "0.76",
+        active: "Migrate gRPC services to OAuth2 with short-lived JWT tokens.",
+        prior: "Legacy session cookies on REST gateway."
+      }
+    ];
+
+    function switchTab(tab) {
+      currentTab = tab;
+      ["notes", "decisions", "actions"].forEach(t => {
+        document.getElementById("tab-" + t).classList.toggle("active", t === tab);
+      });
+      renderBody();
+    }
+
+    function renderBody() {
+      const body = document.getElementById("hud-body");
+      body.innerHTML = "";
+      if (currentTab === "notes") {
+        if (notes.length === 0) {
+          body.innerHTML = `<div style="color:var(--dim);font-size:12px;text-align:center;margin-top:40px;">Click <b>▶ Play Live Meeting Simulation</b> to watch the live dual-stream pipeline.</div>`;
+          return;
+        }
+        notes.forEach(n => {
+          const div = document.createElement("div");
+          div.className = "stream-card " + (n.speaker === "YOU" ? "card-you" : "card-attendees");
+          const badgeClass = n.speaker === "YOU" ? "badge-you" : "badge-attendees";
+          div.innerHTML = `
+            <div style="margin-bottom:5px;">
+              <span class="spk-badge ${badgeClass}">${n.speaker}</span>
+              <span style="color:var(--dim);font-size:10px;">${n.time}</span>
+            </div>
+            <div style="color:#f1f5f9;line-height:1.5;">${n.text}</div>
+          `;
+          body.appendChild(div);
+        });
+      } else if (currentTab === "decisions") {
+        decisions.forEach(d => {
+          const div = document.createElement("div");
+          div.className = "card-decision " + (d.status === "SUPERSEDED" ? "superseded" : "");
+          const pill = d.status === "ACTIVE" ? "badge-active" : "badge-superseded";
+          div.innerHTML = `
+            <div style="margin-bottom:4px;">
+              <span class="spk-badge ${pill}">${d.status}</span>
+              <strong style="color:#f8fafc;">${d.entity}</strong>
+            </div>
+            <div style="color:#cbd5e1;margin-bottom:4px;">${d.summary}</div>
+            <div style="color:var(--dim);font-size:10px;">${d.meta}</div>
+          `;
+          body.appendChild(div);
+        });
+      } else {
+        if (actions.length === 0) {
+          body.innerHTML = `<div style="color:var(--dim);font-size:12px;text-align:center;margin-top:40px;">Action items extracted from speech appear here automatically.</div>`;
+          return;
+        }
+        actions.forEach(a => {
+          const div = document.createElement("div");
+          div.className = "card-action";
+          div.innerHTML = `
+            <div style="margin-bottom:4px;"><span class="spk-badge badge-assignee">@${a.assignee}</span></div>
+            <div style="color:#f1f5f9;">• ${a.task}</div>
+          `;
+          body.appendChild(div);
+        });
+      }
+      body.scrollTop = body.scrollHeight;
+    }
+
+    function showNudge(title, entity, activeText, priorText, score) {
+      const toast = document.getElementById("nudge-toast");
+      toast.style.display = "block";
+      toast.innerHTML = `
+        <div style="color:var(--amber);font-weight:700;margin-bottom:4px;">💡 ZERO-CLICK LOCAL RAG (${score} cos-sim): ${title}</div>
+        <div style="color:var(--iris);font-weight:700;">${entity}</div>
+        <div style="color:var(--emerald);font-weight:600;margin-top:2px;">• CURRENT TRUTH [ACTIVE]:</div>
+        <div style="color:#f1f5f9;margin-left:8px;">${activeText}</div>
+        ${priorText ? `<div style="color:var(--dim);font-size:10px;margin-left:8px;margin-top:2px;"><s>${priorText}</s> <span style="color:var(--rose);">[SUPERSEDED]</span></div>` : ""}
+      `;
+    }
+
+    function runQuery(q) {
+      const query = (q || "").trim().toLowerCase();
+      if (!query) return;
+      const match = vectorKB.find(item => item.keys.some(k => query.includes(k))) || vectorKB[0];
+      showNudge(`Query "${q}"`, match.entity, match.active, match.prior, match.score);
+      document.getElementById("hud-search").value = "";
+    }
+
+    function setVU(mic, call) {
+      document.getElementById("vu-mic").style.width = mic + "%";
+      document.getElementById("vu-call").style.width = call + "%";
+    }
+
+    function startSimulation() {
+      simTimers.forEach(clearTimeout);
+      simTimers = [];
+      if (clockInterval) clearInterval(clockInterval);
+
+      notes.length = 0;
+      actions.length = 0;
+      while (decisions.length > 2) decisions.shift();
+      document.getElementById("dec-count").textContent = decisions.length;
+      document.getElementById("act-count").textContent = "0";
+      document.getElementById("nudge-toast").style.display = "none";
+      switchTab("notes");
+
+      secondsElapsed = 0;
+      document.getElementById("hud-timer").textContent = "00:00";
+      document.getElementById("sim-status").textContent = "Streaming live...";
+      clockInterval = setInterval(() => {
+        secondsElapsed++;
+        const m = String(Math.floor(secondsElapsed / 60)).padStart(2, "0");
+        const s = String(secondsElapsed % 60).padStart(2, "0");
+        document.getElementById("hud-timer").textContent = `${m}:${s}`;
+      }, 1000);
+
+      const schedule = [
+        [400, () => {
+          setVU(0, 62);
+          notes.push({ speaker: "ATTENDEES", time: "10:02 AM", text: "All right team, we need to finalize our caching tier before the v2 release date. Are we sticking with Redis?" });
+          renderBody();
+        }],
+        [2400, () => {
+          setVU(74, 0);
+          notes.push({ speaker: "YOU", time: "10:02 AM", text: "I thought we agreed to hold off on Redis until Schema v2 lands to avoid unnecessary memory overhead." });
+          renderBody();
+        }],
+        [4500, () => {
+          setVU(0, 58);
+          notes.push({ speaker: "ATTENDEES", time: "10:02 AM", text: "Wait, what did we decide about GraphQL caching last month?" });
+          renderBody();
+        }],
+        [5600, () => {
+          showNudge(
+            "\"what did we decide about GraphQL caching...\"",
+            "GraphQL Caching",
+            "Hold off on Redis until Schema v2 lands to avoid memory overhead.",
+            "Use Redis for response caching across all endpoints.",
+            "0.84"
+          );
+        }],
+        [8200, () => {
+          setVU(0, 68);
+          notes.push({ speaker: "ATTENDEES", time: "10:03 AM", text: "Got it, makes total sense. Let's deploy Kubernetes with an NGINX ingress controller backed by PostgreSQL, and migrate gRPC auth to OAuth2." });
+          renderBody();
+        }],
+        [9500, () => {
+          decisions.unshift({
+            entity: "Kubernetes Ingress",
+            status: "ACTIVE",
+            summary: "Deployed Kubernetes with NGINX ingress controller backed by PostgreSQL; migrating gRPC auth to OAuth2.",
+            meta: "Proposed by Attendees • Decided by Team"
+          });
+          document.getElementById("dec-count").textContent = decisions.length;
+        }],
+        [11400, () => {
+          setVU(0, 52);
+          notes.push({ speaker: "ATTENDEES", time: "10:03 AM", text: "Sanchit, can you update the ADR documentation and sync with the DevOps team by tomorrow morning?" });
+          renderBody();
+          actions.push({ assignee: "Sanchit", task: "Update the ADR documentation and sync with the DevOps team by tomorrow morning." });
+          document.getElementById("act-count").textContent = actions.length;
+        }],
+        [13500, () => {
+          setVU(68, 0);
+          notes.push({ speaker: "YOU", time: "10:03 AM", text: "On it. I'll export the meeting minutes and push the updated ADR." });
+          renderBody();
+        }],
+        [14800, () => {
+          setVU(0, 0);
+          document.getElementById("sim-status").textContent = "Completed — Explore Tabs or Search RAG!";
+        }]
+      ];
+
+      schedule.forEach(([ms, fn]) => simTimers.push(setTimeout(fn, ms)));
+    }
+
+    renderBody();
+  </script>
+</body>
+</html>
