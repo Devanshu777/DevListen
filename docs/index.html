@@ -237,8 +237,8 @@
         <span class="tech-badge">Win32 WDA_EXCLUDEFROMCAPTURE</span>
       </div>
       <div class="cta-row">
-        <button class="btn-primary" onclick="startSimulation(false)">▶ Play Live Meeting Simulation</button>
-        <button class="btn-secondary" onclick="startSimulation(true)">🔊 Play with Browser Voice</button>
+        <button class="btn-primary" onclick="startSimulation(true)">▶ Play Live Demo (Neural AI Voices)</button>
+        <button class="btn-secondary" onclick="startSimulation(false)">🔇 Play Muted</button>
         <a class="btn-secondary" href="#architecture">Architectural Flow ↓</a>
       </div>
     </div>
@@ -509,13 +509,17 @@
       document.getElementById("rag-input").value = "";
     }
 
-    function speakLine(text) {
-      if (!useVoice || !("speechSynthesis" in window)) return;
-      window.speechSynthesis.cancel();
-      const u = new SpeechSynthesisUtterance(text);
-      u.rate = 1.03;
-      window.speechSynthesis.speak(u);
-    }
+    let currentAudio = null;
+    let simRunId = 0;
+
+    const demoScript = [
+      { speaker: "ATTENDEES", time: "00:02", audio: "audio/turn_0.mp3", text: "All right team, we need to finalize our database and caching tier before the v2 release. Are we sticking with Redis?", event: null },
+      { speaker: "YOU", time: "00:09", audio: "audio/turn_1.mp3", text: "I thought we agreed to hold off on Redis until Schema v2 lands to avoid unnecessary memory overhead.", event: null },
+      { speaker: "ATTENDEES", time: "00:16", audio: "audio/turn_2.mp3", text: "Wait, what did we decide about the GraphQL caching strategy last month?", event: "rag" },
+      { speaker: "ATTENDEES", time: "00:21", audio: "audio/turn_3.mp3", text: "Got it, makes total sense. Let's deploy the Kubernetes cluster with an NGINX ingress controller hooked up to PostgreSQL.", event: "decision" },
+      { speaker: "ATTENDEES", time: "00:29", audio: "audio/turn_4.mp3", text: "Devanshu, can you update the ADR documentation and sync with the DevOps team by tomorrow morning?", event: "action" },
+      { speaker: "YOU", time: "00:35", audio: "audio/turn_5.mp3", text: "On it. I'll export the meeting minutes and share the updated ADR with the infra squad.", event: null }
+    ];
 
     function updateInsights() {
       const latest = notes.length ? notes[notes.length - 1].text.slice(0, 68) + "..." : "Listening...";
@@ -528,12 +532,86 @@
       document.getElementById("act-count").textContent = actions.length;
     }
 
+    function fireTurnEvent(ev, text) {
+      if (ev === "rag") {
+        renderReply(text, kb[0]);
+      } else if (ev === "decision") {
+        decisions.unshift({ entity: "Kubernetes Ingress", status: "ACTIVE", summary: "Deployed Kubernetes cluster with NGINX ingress controller hooked up to PostgreSQL." });
+      } else if (ev === "action") {
+        actions.push({ assignee: "Devanshu", task: "Update the ADR documentation and sync with the DevOps team by tomorrow morning." });
+      }
+      updateInsights();
+      if (currentView !== "capture") renderStream();
+    }
+
+    function playTurn(idx, runId) {
+      if (runId !== simRunId) return;
+      if (idx >= demoScript.length) {
+        waveEnergy = 0.08;
+        document.getElementById("sim-status").textContent = "Simulation complete — Explore tabs or test Local RAG!";
+        return;
+      }
+
+      const item = demoScript[idx];
+      const words = item.text.split(" ");
+      const noteObj = { speaker: item.speaker, time: item.time, text: "" };
+      notes.push(noteObj);
+      waveEnergy = item.speaker === "YOU" ? 0.78 : 0.72;
+      renderStream();
+
+      const finishTurn = () => {
+        if (runId !== simRunId) return;
+        noteObj.text = item.text;
+        waveEnergy = 0.08;
+        renderStream();
+        fireTurnEvent(item.event, item.text);
+        simTimers.push(setTimeout(() => playTurn(idx + 1, runId), 650));
+      };
+
+      if (useVoice) {
+        const audio = new Audio(item.audio);
+        currentAudio = audio;
+        audio.addEventListener("timeupdate", () => {
+          if (runId !== simRunId || !audio.duration) return;
+          const elapsed = Math.max(0, audio.currentTime - 0.22);
+          const span = Math.max(0.5, audio.duration - 0.26);
+          const count = Math.min(words.length, Math.max(1, Math.floor((elapsed / span) * words.length)));
+          if (audio.currentTime >= 0.22) {
+            noteObj.text = words.slice(0, count).join(" ") + (count < words.length ? "..." : "");
+            renderStream();
+          }
+        });
+        audio.addEventListener("ended", finishTurn);
+        audio.play().catch(() => {
+          // Autoplay fallback if blocked: run timed fallback
+          noteObj.text = item.text;
+          renderStream();
+          simTimers.push(setTimeout(finishTurn, 3200));
+        });
+      } else {
+        let step = 0;
+        const iv = setInterval(() => {
+          if (runId !== simRunId) { clearInterval(iv); return; }
+          step += 2;
+          if (step >= words.length) {
+            clearInterval(iv);
+            finishTurn();
+          } else {
+            noteObj.text = words.slice(0, step).join(" ") + "...";
+            renderStream();
+          }
+        }, 320);
+      }
+    }
+
     function startSimulation(withVoice) {
       useVoice = withVoice;
+      simRunId++;
+      const runId = simRunId;
       simTimers.forEach(clearTimeout);
       simTimers = [];
       if (clockInterval) clearInterval(clockInterval);
-      if ("speechSynthesis" in window) window.speechSynthesis.cancel();
+      if (currentAudio) { currentAudio.pause(); currentAudio = null; }
 
       notes.length = 0;
       actions.length = 0;
@@ -543,60 +621,14 @@
 
       seconds = 0;
       document.getElementById("hud-timer").textContent = "00:00";
-      document.getElementById("sim-status").textContent = "Streaming live...";
+      document.getElementById("sim-status").textContent = withVoice ? "Playing Neural AI Voice Demo..." : "Streaming live (muted)...";
       clockInterval = setInterval(() => {
         seconds++;
         document.getElementById("hud-timer").textContent =
           String(Math.floor(seconds / 60)).padStart(2, "0") + ":" + String(seconds % 60).padStart(2, "0");
       }, 1000);
 
-      const steps = [
-        [300, () => {
-          waveEnergy = 0.72;
-          const t = "All right team, we need to finalize our database and caching tier before the v2 release. Are we sticking with Redis?";
-          notes.push({ speaker: "ATTENDEES", time: "00:02", text: t });
-          speakLine(t); renderStream(); updateInsights();
-        }],
-        [4200, () => {
-          waveEnergy = 0.78;
-          const t = "I thought we agreed to hold off on Redis until Schema v2 lands to avoid unnecessary memory overhead.";
-          notes.push({ speaker: "YOU", time: "00:06", text: t });
-          speakLine(t); renderStream(); updateInsights();
-        }],
-        [8200, () => {
-          waveEnergy = 0.68;
-          const t = "Wait, what did we decide about the GraphQL caching strategy last month?";
-          notes.push({ speaker: "ATTENDEES", time: "00:10", text: t });
-          speakLine(t); renderStream(); updateInsights();
-        }],
-        [9600, () => { renderReply("Wait, what did we decide about the GraphQL caching strategy last month?", kb[0]); }],
-        [12000, () => {
-          waveEnergy = 0.75;
-          const t = "Got it, makes total sense. Let's deploy the Kubernetes cluster with an NGINX ingress controller hooked up to PostgreSQL.";
-          notes.push({ speaker: "ATTENDEES", time: "00:14", text: t });
-          decisions.unshift({ entity: "Kubernetes Ingress", status: "ACTIVE", summary: "Deployed Kubernetes cluster with NGINX ingress controller hooked up to PostgreSQL." });
-          speakLine(t); renderStream(); updateInsights();
-        }],
-        [16500, () => {
-          waveEnergy = 0.65;
-          const t = "Devanshu, can you update the ADR documentation and sync with the DevOps team by tomorrow morning?";
-          notes.push({ speaker: "ATTENDEES", time: "00:18", text: t });
-          actions.push({ assignee: "Devanshu", task: "Update the ADR documentation and sync with the DevOps team by tomorrow morning." });
-          speakLine(t); renderStream(); updateInsights();
-        }],
-        [20500, () => {
-          waveEnergy = 0.70;
-          const t = "On it. I'll export the meeting minutes and share the updated ADR with the infra squad.";
-          notes.push({ speaker: "YOU", time: "00:22", text: t });
-          speakLine(t); renderStream(); updateInsights();
-        }],
-        [23500, () => {
-          waveEnergy = 0.08;
-          document.getElementById("sim-status").textContent = "Simulation complete — Explore tabs or test Local RAG!";
-        }]
-      ];
-
-      steps.forEach(([ms, fn]) => simTimers.push(setTimeout(fn, ms)));
+      playTurn(0, runId);
     }
 
     renderStream();
