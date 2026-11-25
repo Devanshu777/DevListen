@@ -1,33 +1,53 @@
-# DevListen — 100% Offline Edge AI Meeting Copilot & Bi-Temporal Knowledge Graph
+<div align="center">
 
-> **Zero-Cloud. Zero-Latency. Hardware-Stealth.**  
-> A privacy-first, developer-focused Edge AI meeting copilot that runs **100% locally** on your machine—combining **Dual-Stream Streaming ASR**, **Bi-Temporal Knowledge Graph (GraphRAG)**, **384-d ONNX Vector RAG**, and **Zero-Trust Encryption** without bots or cloud APIs.
+# 🎙️ DevListen
 
----
+**100% Offline Edge AI Meeting Copilot & Bi-Temporal Knowledge Graph**
 
-### 🌐 Interactive Live Showcase (Works on Mobile & Corporate Laptops)
-Try the interactive HUD, **Bi-Temporal Decision Graph**, and **Local Vector RAG** directly in your browser with zero installation:
+*Zero-Cloud. Zero-Latency. Zero Meeting Bots. Hardware-Invisible on Screen Shares.*
 
-👉 **[Launch Live Web Demo (`https://devanshu777.github.io/DevListen/`)](https://devanshu777.github.io/DevListen/)**
+[![Live Demo](https://img.shields.io/badge/Live_Demo-Interactive_Web_HUD-06b6d4?style=for-the-badge)](https://devanshu777.github.io/DevListen/)
+[![Python](https://img.shields.io/badge/Python-3.10%2B-3776AB?style=for-the-badge&logo=python&logoColor=white)](https://www.python.org/)
+[![Inference](https://img.shields.io/badge/Edge_AI-INT8_Whisper_%2B_ONNX-10b981?style=for-the-badge)](https://github.com/Devanshu777/DevListen)
+[![Platform](https://img.shields.io/badge/OS-Windows_(macOS_WIP)-6366f1?style=for-the-badge)](https://github.com/Devanshu777/DevListen)
 
----
+[🌐 Launch Live Interactive Demo](https://devanshu777.github.io/DevListen/) • [📖 Why I Built This](#-why-i-built-devlisten) • [🏗️ Architecture](#️-layered-system-architecture) • [⚡ Quickstart](#-quickstart) • [🤝 Roadmap & Contribute](#-current-status-limitations--roadmap)
 
-### 🎯 Why DevListen? The Problem We Are Solving
-
-Engineering teams lose critical context every week inside Zoom, Teams, and Webex calls—and existing AI meeting tools fail them in four fundamental ways:
-
-1. **Architectural Amnesia & "Decision Drift":** Teams verbally decide *"Hold off on Redis until Schema v2 lands"*, then two weeks later nobody remembers why or whether an older decision is still valid. **Flat Vector RAG makes this worse** by retrieving both the deprecated decision and the current one.  
-   → **DevListen solves this** with a **Bi-Temporal Knowledge Graph** (`ACTIVE` vs `SUPERSEDED` lineage) that surfaces *current* truth and drafts a ready-to-speak response **zero-click** the moment a question is asked.
-2. **Enterprise Privacy & NDA Walls:** Streaming confidential architecture reviews, client calls, or security triage to third-party cloud SaaS APIs violates NDA/SOC2/GDPR policies.  
-   → **DevListen solves this** by running **100% offline on your CPU** (`faster-whisper` INT8 + `BGE-Small` ONNX + DPAPI/AES-256-GCM encrypted SQLite WAL). Zero bytes ever leave your machine.
-3. **Intrusive Meeting Bots & Screen-Share Leaks:** Cloud notetakers drop an awkward *"AI Bot has joined the call"* into meetings, and standard overlays get exposed when you share your screen.  
-   → **DevListen solves this** by capturing OS audio passively (`WASAPI Loopback` + `Mic`) with **zero bots in the call**, and using Win32 `WDA_EXCLUDEFROMCAPTURE` so your copilot stays **100% invisible on screen shares**.
-4. **Fast-Speech Word Loss in Naive Local STT:** Out-of-the-box local Whisper pipelines hard-chop audio at fixed 2-second intervals and clip rapid syllables with aggressive VAD.  
-   → **DevListen solves this** using a **400ms acoustic boundary overlap** + N-gram deduplication pipeline so fast speakers never lose words.
+</div>
 
 ---
 
-### 🏗️ Layered System Architecture (5 Decoupled Layers)
+## 📖 Why I Built DevListen
+
+In real engineering teams, the most important architectural decisions happen **verbally** inside Zoom, Teams, Meet, or Webex calls (*"Hold off on Redis until Schema v2 lands"*). Two weeks later, someone asks *"Wait, aren't we using Redis?"*—and nobody remembers why the plan changed.
+
+I tried existing AI meeting tools and hit four walls every single time:
+
+1. **Flat Vector RAG retrieves stale truth:** Standard RAG dumps deprecated decisions right next to current ones, causing contradictions.
+2. **Cloud bots violate NDA & Infosec rules:** Sending confidential architecture reviews or client calls to external cloud APIs is a non-starter in enterprise teams.
+3. **Intrusive bots & awkward screen shares:** Dropping an *"AI Notetaker Bot has joined"* into a call breaks trust, and normal HUDs leak on screen shares.
+4. **Naive local STT clips fast speech:** Out-of-the-box local Whisper scripts hard-chop buffers every 2 seconds and drop syllables whenever someone speaks quickly.
+
+So I built **DevListen** from scratch to run **100% locally on CPU**—combining **Dual-Stream Streaming ASR**, a **Bi-Temporal Knowledge Graph**, **384-d ONNX Vector RAG**, and **OS-level screen-share invisibility**.
+
+> **Try it on your phone or corporate laptop right now (no install required):**  
+> 👉 **[https://devanshu777.github.io/DevListen/](https://devanshu777.github.io/DevListen/)**
+
+---
+
+## ⚡ How It Works (5-Step Local Pipeline)
+
+| Step | What Happens | Under the Hood |
+| :--- | :--- | :--- |
+| **1. Capture** | Passively records your mic & meeting audio with **zero bots** | `WASAPI Loopback (48kHz)` + `Mic` → Polyphase Sinc Resample (`16kHz PCM`) |
+| **2. Transcribe** | Streams `[YOU]` & `[ATTENDEES]` without clipping fast speakers | `RealtimeSTT` (sub-100ms) + `faster-whisper INT8` (**400ms overlap**, `vad_filter=False`) |
+| **3. Understand** | Extracts decisions, action items & detects spoken questions | `DecisionExtractor`, `CommitmentExtractor`, `QuestionDetector`, `TurnAggregator` |
+| **4. Remember** | Stores current vs. superseded decisions in `<10ms` RAG | `TemporalDecisionGraph` (`ACTIVE`/`SUPERSEDED`) + `BAAI/bge-small-en-v1.5` (384-d ONNX) |
+| **5. Assist** | Drafts a natural spoken reply on a **screen-share invisible** HUD | `DevListen Studio` (`PySide6` + `WDA_EXCLUDEFROMCAPTURE 0x11`) + `DPAPI/AES-256-GCM` |
+
+---
+
+## 🏗️ Layered System Architecture
 
 ```mermaid
 flowchart TB
@@ -62,38 +82,34 @@ flowchart TB
     end
 ```
 
-#### Why This Architecture Is Faster, Cleaner & More Efficient:
-1. **Dual-Stream Hardware Separation (`YOU` vs `ATTENDEES`):** Capturing your microphone separately from OS loopback audio eliminates acoustic echo/crosstalk and gives deterministic speaker separation for your voice without wasting compute.
-2. **400ms Acoustic Boundary Overlap + `vad_filter=False`:** Standard streaming STT pipelines hard-chop audio buffers, slicing syllables in half on fast speakers. Retaining a 400ms trailing overlap and deduplicating 1–5 word seams in `ConversationalTurnAggregator` preserves 100% of boundary words on CPU.
-3. **Bi-Temporal Knowledge Graph vs. Flat Vector RAG:** Flat vector databases retrieve outdated decisions alongside current ones, causing contradictions. Tracking `ACTIVE` vs `SUPERSEDED` state lineage ensures RAG always surfaces *current* architectural truth in `<10ms`.
-4. **Quantized Edge Inference (`INT8` + `ONNX Runtime`):** Running `faster-whisper` via CTranslate2 INT8 and `BAAI/bge-small-en-v1.5` via ONNX Runtime avoids heavy PyTorch GPU memory footprints—delivering `<190ms` ASR latency and `<10ms` vector search on standard consumer CPUs.
-5. **Zero-Trust Local Storage:** Transcripts are encrypted at rest using **Windows DPAPI + AES-256-GCM** inside SQLite WAL mode, while the PySide6 UI uses Win32 `WDA_EXCLUDEFROMCAPTURE` so the copilot stays invisible on screen shares.
+### Why This Architecture Is Efficient
+- **Dual-Stream Isolation (`YOU` vs `ATTENDEES`):** Separating mic from OS loopback at the driver level eliminates acoustic echo and self-diarization errors.
+- **400ms Acoustic Overlap + `vad_filter=False`:** Prevents mid-word syllable slicing on rapid speakers while `ConversationalTurnAggregator` deduplicates 1–5 word seams cleanly.
+- **Bi-Temporal GraphRAG:** Models chronological state decay (`ACTIVE` vs `SUPERSEDED`) so RAG never pollutes answers with deprecated decisions.
+- **Quantized Edge Inference:** Runs `CTranslate2 INT8` + `ONNX Runtime` directly on consumer CPUs (`<190ms` ASR latency, `<10ms` vector search, `0` cloud API calls).
 
 ---
 
-### 🚀 Current Status, Limitations & Active Roadmap (Contributions Welcome!)
+## 🤝 Current Status, Limitations & Roadmap
 
-I am building DevListen sincerely in the open and welcome **AI/ML engineers, systems programmers, and contributors** to collaborate:
+I am building DevListen sincerely in the open and welcome **AI/ML engineers, systems programmers, and contributors**:
 
 - **🎙️ Best-in-Class Local STT Baseline:** Our dual-engine local STT pipeline (`faster-whisper` INT8 + `RealtimeSTT` + 400ms overlap) already outperforms most out-of-the-box open-source streaming setups in boundary word retention and CPU responsiveness.
-- **🧠 Closing the Gap to DeepSeek Nova2 & Qwen 3.8:** Actively working to bring local suggested-response synthesis closer to **DeepSeek Nova2** quality. Due to current local hardware constraints (CPU/RAM limits), I have not yet been able to benchmark larger frontier open-source local LLMs like **Qwen 3.8**—**contributors with GPU / Apple Silicon setups are warmly invited to help benchmark & integrate quantized `llama.cpp` / GGUF backends!**
-- **🗣️ Universal Plugin-Free Speaker Diarization:** Currently engineering app-agnostic acoustic speaker diarization so DevListen identifies remote speakers across **Zoom, Microsoft Teams, Google Meet, Webex, and Discord** directly from system audio—without requiring brittle per-app plugins or intrusive meeting bots.
-- **🍎 Cross-Platform Port (Windows → macOS):** Currently **Windows-only** (WASAPI Loopback, DPAPI, Win32 `WDA_EXCLUDEFROMCAPTURE`). **macOS support** (CoreAudio / ScreenCaptureKit, Keychain, `NSWindow` sharing exclusion) is actively planned.
+- **🧠 Closing the Gap to DeepSeek Nova2 & Qwen 3.8:** Actively working to bring local suggested-response synthesis closer to **DeepSeek Nova2** quality. Due to current local hardware constraints (CPU/RAM limits), I have not yet been able to benchmark larger frontier open-source LLMs like **Qwen 3.8** locally—**contributors with GPU / Apple Silicon rigs are warmly invited to help benchmark and integrate `llama.cpp` / GGUF backends!**
+- **🗣️ Universal Plugin-Free Speaker Diarization:** Currently engineering app-agnostic acoustic speaker diarization so DevListen identifies remote speakers across **Zoom, Microsoft Teams, Google Meet, Webex, and Discord** directly from system audio—without requiring brittle per-app plugins or meeting bots.
+- **🍎 Windows Today → macOS Next:** Currently **Windows-only** (WASAPI Loopback, DPAPI, Win32 `WDA_EXCLUDEFROMCAPTURE`). **macOS support** (CoreAudio / ScreenCaptureKit, Keychain, `NSWindow` sharing exclusion) is actively in progress.
 
 ---
 
-### 🛠️ Tech Stack & ML Systems Keywords
-`Edge AI` • `Streaming ASR` • `faster-whisper (CTranslate2 INT8)` • `RealtimeSTT (WebRTC + Silero Dual-VAD)` • `Local Vector RAG` • `Bi-Temporal Knowledge Graph (GraphRAG)` • `ONNX Runtime` • `BAAI/bge-small-en-v1.5 (384-d Embeddings)` • `Cosine Similarity Search` • `Asynchronous Producer-Consumer Pipelines` • `DPAPI + AES-256-GCM` • `SQLite WAL` • `PySide6`
-
----
-
-### 🎥 Run the Voice-Synchronized Demo & Live App
+## ⚡ Quickstart
 
 ```powershell
-# 1. Install dependencies
+# 1. Clone & install dependencies
+git clone https://github.com/Devanshu777/DevListen.git
+cd DevListen
 pip install -r requirements.txt
 
-# 2. Run the neural-voice synchronized demo (great for previewing UI & RAG)
+# 2. Run the neural-voice synchronized demo (preview UI & RAG flow)
 python demo_mode.py
 
 # 3. Run the full live dual-stream desktop copilot (Mic + Loopback + Stealth)
@@ -107,3 +123,11 @@ python test_turn_aggregation.py
 python test_extractor.py
 python test_semantic.py
 ```
+
+---
+
+<div align="center">
+
+**Keywords:** `Edge AI` • `Streaming ASR` • `CTranslate2 INT8` • `ONNX Runtime` • `Local Vector RAG` • `Bi-Temporal Knowledge Graph (GraphRAG)` • `Dense Embeddings` • `Cosine Similarity Search` • `Dual-VAD` • `Acoustic Boundary Overlap` • `Speaker Diarization` • `Zero-Trust Encryption` • `SQLite WAL` • `PySide6`
+
+</div>
