@@ -442,6 +442,98 @@
     <div class="section" id="architecture">
       <h2 class="section-title">Layered System Architecture &amp; Data Flow</h2>
       <p class="section-sub">5 decoupled layers engineered for low CPU overhead, deterministic concurrency, and zero stale context in RAG.</p>
+
+      <!-- Visual Layered Flow Diagram (SVG) -->
+      <div style="background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:16px;margin-bottom:18px;overflow-x:auto;">
+        <svg viewBox="0 0 1060 390" width="100%" style="min-width:740px;display:block;font-family:'Inter',sans-serif;" xmlns="http://www.w3.org/2000/svg">
+          <defs>
+            <marker id="arrow-c" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+              <path d="M 0 1 L 10 5 L 0 9 z" fill="#06b6d4"/>
+            </marker>
+            <marker id="arrow-p" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+              <path d="M 0 1 L 10 5 L 0 9 z" fill="#a855f7"/>
+            </marker>
+            <marker id="arrow-g" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+              <path d="M 0 1 L 10 5 L 0 9 z" fill="#10b981"/>
+            </marker>
+          </defs>
+
+          <!-- Layer Band Backgrounds -->
+          <rect x="8" y="8" width="1044" height="66" rx="8" fill="#0d1117" stroke="rgba(6,182,212,0.22)"/>
+          <text x="20" y="26" fill="#22d3ee" font-size="10" font-weight="700">L1 • OS AUDIO &amp; HARDWARE INGESTION</text>
+
+          <rect x="8" y="84" width="1044" height="68" rx="8" fill="#0d1117" stroke="rgba(99,102,241,0.25)"/>
+          <text x="20" y="102" fill="#818cf8" font-size="10" font-weight="700">L2 • EDGE STREAMING ASR &amp; TURN AGGREGATION</text>
+
+          <rect x="8" y="162" width="1044" height="72" rx="8" fill="#0d1117" stroke="rgba(168,85,247,0.25)"/>
+          <text x="20" y="180" fill="#c084fc" font-size="10" font-weight="700">L3 • COGNITIVE NLP &amp; BI-TEMPORAL GRAPHRAG</text>
+
+          <rect x="8" y="244" width="1044" height="64" rx="8" fill="#0d1117" stroke="rgba(16,185,129,0.22)"/>
+          <text x="20" y="262" fill="#34d399" font-size="10" font-weight="700">L4 • ZERO-TRUST PERSISTENCE &amp; ENCRYPTION</text>
+
+          <rect x="8" y="318" width="1044" height="64" rx="8" fill="#0d1117" stroke="rgba(245,158,11,0.25)"/>
+          <text x="20" y="336" fill="#fbbf24" font-size="10" font-weight="700">L5 • HARDWARE-STEALTH PRESENTATION</text>
+
+          <!-- L1 Nodes -->
+          <rect x="26" y="34" width="210" height="32" rx="6" fill="#141821" stroke="#06b6d4"/>
+          <text x="131" y="54" text-anchor="middle" fill="#f4f4f5" font-size="11" font-weight="600">User Mic (44.1/48kHz)</text>
+
+          <rect x="300" y="34" width="260" height="32" rx="6" fill="#141821" stroke="#a855f7"/>
+          <text x="430" y="54" text-anchor="middle" fill="#f4f4f5" font-size="11" font-weight="600">WASAPI Loopback (Zoom/Teams/Webex)</text>
+
+          <rect x="635" y="34" width="390" height="32" rx="6" fill="#141821" stroke="rgba(255,255,255,0.2)"/>
+          <text x="830" y="54" text-anchor="middle" fill="#d4d4d8" font-size="11">Polyphase Sinc Resample (16kHz PCM) + VAD + RingBuffer</text>
+
+          <line x1="236" y1="50" x2="294" y2="50" stroke="transparent"/>
+          <line x1="560" y1="50" x2="629" y2="50" stroke="#a855f7" stroke-width="1.6" marker-end="url(#arrow-p)"/>
+
+          <!-- L2 Nodes -->
+          <rect x="26" y="110" width="250" height="34" rx="6" fill="#141821" stroke="#06b6d4"/>
+          <text x="151" y="131" text-anchor="middle" fill="#f4f4f5" font-size="11" font-weight="600">RealtimeSTT (tiny+base • &lt;100ms)</text>
+
+          <rect x="315" y="110" width="310" height="34" rx="6" fill="#141821" stroke="#a855f7"/>
+          <text x="470" y="131" text-anchor="middle" fill="#f4f4f5" font-size="11" font-weight="600">faster-whisper INT8 (400ms Overlap • vad=False)</text>
+
+          <rect x="670" y="110" width="355" height="34" rx="6" fill="#141821" stroke="#818cf8"/>
+          <text x="847" y="131" text-anchor="middle" fill="#f4f4f5" font-size="11" font-weight="600">TurnAggregator (1-5 Word N-gram Dedupe)</text>
+
+          <line x1="131" y1="66" x2="131" y2="104" stroke="#06b6d4" stroke-width="1.6" marker-end="url(#arrow-c)"/>
+          <line x1="470" y1="66" x2="470" y2="104" stroke="#a855f7" stroke-width="1.6" marker-end="url(#arrow-p)"/>
+          <line x1="276" y1="127" x2="309" y2="127" stroke="transparent"/>
+          <line x1="625" y1="127" x2="664" y2="127" stroke="#a855f7" stroke-width="1.6" marker-end="url(#arrow-p)"/>
+
+          <!-- L3 Nodes -->
+          <rect x="26" y="188" width="275" height="36" rx="6" fill="#141821" stroke="#c084fc"/>
+          <text x="163" y="210" text-anchor="middle" fill="#f4f4f5" font-size="11" font-weight="600">Decision / Commitment / Question NLP</text>
+
+          <rect x="345" y="188" width="320" height="36" rx="6" fill="#141821" stroke="#10b981"/>
+          <text x="505" y="210" text-anchor="middle" fill="#f4f4f5" font-size="11" font-weight="600">Bi-Temporal Graph (ACTIVE vs SUPERSEDED)</text>
+
+          <rect x="710" y="188" width="315" height="36" rx="6" fill="#141821" stroke="#06b6d4"/>
+          <text x="867" y="210" text-anchor="middle" fill="#f4f4f5" font-size="11" font-weight="600">BGE-Small 384-d ONNX Search (&lt;10ms)</text>
+
+          <line x1="847" y1="144" x2="847" y2="182" stroke="#06b6d4" stroke-width="1.6" marker-end="url(#arrow-c)"/>
+          <line x1="301" y1="206" x2="339" y2="206" stroke="#c084fc" stroke-width="1.6" marker-end="url(#arrow-p)"/>
+          <line x1="665" y1="206" x2="704" y2="206" stroke="#10b981" stroke-width="1.6" marker-end="url(#arrow-g)"/>
+
+          <!-- L4 Nodes -->
+          <rect x="180" y="268" width="340" height="32" rx="6" fill="#141821" stroke="#10b981"/>
+          <text x="350" y="288" text-anchor="middle" fill="#f4f4f5" font-size="11" font-weight="600">DPAPI + AES-256-GCM Encrypted SQLite WAL</text>
+
+          <rect x="580" y="268" width="280" height="32" rx="6" fill="#141821" stroke="#34d399"/>
+          <text x="720" y="288" text-anchor="middle" fill="#f4f4f5" font-size="11" font-weight="600">Markdown ADR &amp; Minutes Exporter</text>
+
+          <line x1="505" y1="224" x2="380" y2="263" stroke="#10b981" stroke-width="1.6" marker-end="url(#arrow-g)"/>
+          <line x1="520" y1="284" x2="574" y2="284" stroke="#10b981" stroke-width="1.6" marker-end="url(#arrow-g)"/>
+
+          <!-- L5 Nodes -->
+          <rect x="180" y="342" width="680" height="32" rx="6" fill="#141821" stroke="#fbbf24"/>
+          <text x="520" y="362" text-anchor="middle" fill="#fafafa" font-size="11.5" font-weight="700">DevListen Studio HUD (PySide6 + QPainter Waveform + Natural RAG Reply + WDA_EXCLUDEFROMCAPTURE 0x11)</text>
+
+          <line x1="867" y1="224" x2="780" y2="336" stroke="#06b6d4" stroke-width="1.6" marker-end="url(#arrow-c)"/>
+        </svg>
+      </div>
+
       <div class="layer-stack">
         <div class="layer-row">
           <div class="layer-tag">L1 • OS Audio Ingestion</div>
