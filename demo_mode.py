@@ -67,6 +67,22 @@ def format_context_html(ctx: dict) -> str:
     return html
 
 
+def get_mp3_duration_sec(mp3_path: str) -> float:
+    """Queries exact MP3 duration in seconds via Windows winmm MCI."""
+    try:
+        winmm = ctypes.windll.winmm
+        alias = f"len_{int(time.time() * 1000)}"
+        buf = ctypes.create_unicode_buffer(64)
+        winmm.mciSendStringW(f'open "{mp3_path}" type mpegvideo alias {alias}', None, 0, None)
+        winmm.mciSendStringW(f'set {alias} time format milliseconds', None, 0, None)
+        winmm.mciSendStringW(f'status {alias} length', buf, 64, None)
+        winmm.mciSendStringW(f'close {alias}', None, 0, None)
+        ms = int(buf.value)
+        return max(1.0, ms / 1000.0)
+    except Exception:
+        return 4.5
+
+
 def play_mp3_blocking(mp3_path: str):
     """Plays an MP3 file cleanly using Windows winmm MCI without extra dependencies."""
     winmm = ctypes.windll.winmm
@@ -187,7 +203,7 @@ def run_demo():
         },
         {
             "speaker": "ATTENDEES",
-            "text": "Sanchit, can you update the ADR documentation and sync with the DevOps team by tomorrow morning?",
+            "text": "Devanshu, can you update the ADR documentation and sync with the DevOps team by tomorrow morning?",
             "event": "commitment",
         },
         {
@@ -209,24 +225,38 @@ def run_demo():
             full_text = item["text"]
             words = full_text.split()
 
-            # Start audio playback on a worker thread so captions stream while voice speaks
+            # Measure exact audio duration so captions appear RIGHT AFTER each word is spoken (realistic ASR lag)
+            duration_sec = get_mp3_duration_sec(mp3) if (mp3 and os.path.exists(mp3)) else max(2.0, len(words) * 0.36)
+
+            # Start audio playback on a worker thread
             if mp3 and os.path.exists(mp3):
                 play_t = threading.Thread(target=play_mp3_blocking, args=(mp3,), daemon=True)
             else:
                 play_t = threading.Thread(target=speak_fallback_sapi, args=(full_text,), daemon=True)
             play_t.start()
 
-            # Animate waveform & stream partial caption words smoothly
-            step = max(2, len(words) // 5)
-            for i in range(step, len(words), step):
+            # Initial ~220ms ASR recognition lag + waveform warm-up before first words appear
+            if spk == "YOU":
+                sig.audio_levels.emit(0.75, 0.0)
+            else:
+                sig.audio_levels.emit(0.0, 0.72)
+            time.sleep(0.24)
+
+            # Pace streaming word chunks proportionally across remaining audio duration
+            remaining = max(0.5, duration_sec - 0.30)
+            chunk_size = 2
+            chunks = [words[:i] for i in range(chunk_size, len(words), chunk_size)]
+            per_step = remaining / max(1, len(chunks) + 1)
+
+            for partial in chunks:
                 if not play_t.is_alive():
                     break
                 if spk == "YOU":
                     sig.audio_levels.emit(0.75, 0.0)
                 else:
                     sig.audio_levels.emit(0.0, 0.72)
-                sig.stream_card.emit(" ".join(words[:i]) + "...", spk, False)
-                time.sleep(0.55)
+                sig.stream_card.emit(" ".join(partial) + "...", spk, False)
+                time.sleep(per_step)
 
             play_t.join()
             sig.stream_card.emit(full_text, spk, True)
@@ -246,7 +276,7 @@ def run_demo():
                 })
             elif item["event"] == "commitment":
                 sig.commitment.emit({
-                    "assignee": "Sanchit",
+                    "assignee": "Devanshu",
                     "task": "Update the ADR documentation and sync with the DevOps team by tomorrow morning.",
                 })
 
