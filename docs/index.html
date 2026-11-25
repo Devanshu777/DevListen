@@ -76,36 +76,55 @@
     }
     .btn-secondary:hover { background: rgba(255,255,255,0.09); }
 
-    /* Simulated Background Meeting Stage + Floating DevListen Studio */
+    /* Simulated Realistic Webex/Zoom Background Meeting + Floating DevListen Studio */
     .meeting-stage {
       position: relative;
-      background: linear-gradient(180deg, #0d1017 0%, #090b10 100%);
-      border: 1px solid rgba(255, 255, 255, 0.08);
-      border-radius: 16px;
-      padding: 16px;
+      background: #08090c;
+      border: 1px solid rgba(255, 255, 255, 0.10);
+      border-radius: 14px;
+      padding: 12px 14px;
       margin-top: 22px;
       overflow: hidden;
+      box-shadow: 0 24px 70px rgba(0, 0, 0, 0.7);
     }
     .meeting-bg-bar {
       display: flex; align-items: center; justify-content: space-between;
-      font-size: 11.5px; color: var(--muted); padding-bottom: 10px;
-      border-bottom: 1px solid rgba(255,255,255,0.06); margin-bottom: 12px;
+      font-size: 11px; color: var(--muted); padding-bottom: 9px;
+      border-bottom: 1px solid rgba(255,255,255,0.06); margin-bottom: 10px;
     }
     .meeting-tiles {
-      display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-bottom: 14px;
+      display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-bottom: 10px;
     }
     @media (max-width: 720px) { .meeting-tiles { grid-template-columns: repeat(2, 1fr); } }
     .m-tile {
-      background: rgba(255,255,255,0.025); border: 1px solid rgba(255,255,255,0.07);
-      border-radius: 10px; padding: 10px 12px; display: flex; align-items: center; gap: 9px;
+      position: relative; height: 96px; border-radius: 10px; overflow: hidden;
+      background: radial-gradient(circle at 50% 35%, #232736 0%, #11131a 75%);
+      border: 2px solid rgba(255,255,255,0.07);
+      display: flex; align-items: center; justify-content: center;
       transition: border-color 0.2s, box-shadow 0.2s;
     }
-    .m-tile.speaking-att { border-color: #a855f7; box-shadow: 0 0 14px rgba(168,85,247,0.28); }
-    .m-tile.speaking-you { border-color: #06b6d4; box-shadow: 0 0 14px rgba(6,182,212,0.28); }
+    .m-tile.speaking-att { border-color: #22c55e; box-shadow: 0 0 14px rgba(34,197,94,0.35); }
+    .m-tile.speaking-you { border-color: #06b6d4; box-shadow: 0 0 14px rgba(6,182,212,0.35); }
     .m-avatar {
-      width: 28px; height: 28px; border-radius: 50%; background: #18181b;
-      display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 700; color: #d4d4d8;
+      width: 40px; height: 40px; border-radius: 50%; background: #1e2230;
+      display: flex; align-items: center; justify-content: center; font-size: 15px; font-weight: 700; color: #e4e4e7;
+      border: 1.5px solid rgba(255,255,255,0.14);
     }
+    .m-nameplate {
+      position: absolute; left: 7px; bottom: 6px;
+      background: rgba(0, 0, 0, 0.65); backdrop-filter: blur(4px);
+      padding: 2px 7px; border-radius: 4px; font-size: 10px; font-weight: 600; color: #f4f4f5;
+      display: flex; align-items: center; gap: 4px;
+    }
+    .meeting-controls {
+      display: flex; align-items: center; justify-content: center; gap: 8px; flex-wrap: wrap;
+      padding-top: 8px; border-top: 1px solid rgba(255,255,255,0.06); margin-bottom: 12px;
+    }
+    .mc-btn {
+      background: #181920; border: 1px solid rgba(255,255,255,0.08); color: #e4e4e7;
+      border-radius: 999px; padding: 5px 12px; font-size: 10.5px; font-weight: 500;
+    }
+    .mc-end { background: #dc2626; border-color: #ef4444; color: #fff; font-weight: 700; }
     .studio-shell {
       background: var(--bg);
       border: 1px solid rgba(255, 255, 255, 0.13);
@@ -295,17 +314,37 @@
       </div>
     </div>
 
-    <!-- Simulated Background Meeting Window + Auto-Appearing DevListen Studio -->
+    <!-- Simulated Realistic Webex/Zoom Background Meeting + Auto-Appearing DevListen Studio -->
     <div class="meeting-stage">
       <div class="meeting-bg-bar">
-        <span>🎥 <strong>Zoom / Microsoft Teams</strong> — Product &amp; Architecture Review (4 Participants)</span>
-        <span id="meeting-badge" style="color:var(--emerald);font-weight:600;">● Meeting Active (Background)</span>
+        <span><strong style="color:#38bdf8;">Webex</strong> &nbsp;•&nbsp; Meeting info &nbsp;|&nbsp; Product &amp; Architecture Review</span>
+        <span id="meeting-badge" style="color:var(--emerald);font-weight:600;">● 12:40 &nbsp; Meeting Active</span>
       </div>
       <div class="meeting-tiles">
-        <div class="m-tile" id="tile-alex"><div class="m-avatar" style="border:1.5px solid #a855f7;color:#c084fc;">A</div><div><div style="font-size:11.5px;font-weight:600;">Alex (Lead)</div><div style="font-size:9.5px;color:var(--dim);">Remote Loopback</div></div></div>
-        <div class="m-tile"><div class="m-avatar">P</div><div><div style="font-size:11.5px;font-weight:600;">Priya (QA)</div><div style="font-size:9.5px;color:var(--dim);">Muted</div></div></div>
-        <div class="m-tile" id="tile-you"><div class="m-avatar" style="border:1.5px solid #06b6d4;color:#22d3ee;">D</div><div><div style="font-size:11.5px;font-weight:600;">Devanshu (You)</div><div style="font-size:9.5px;color:var(--dim);">Local Mic</div></div></div>
-        <div class="m-tile"><div class="m-avatar">S</div><div><div style="font-size:11.5px;font-weight:600;">Sam (Infra)</div><div style="font-size:9.5px;color:var(--dim);">Listening</div></div></div>
+        <div class="m-tile" id="tile-alex">
+          <div class="m-avatar" style="background:linear-gradient(135deg,#3b82f6,#8b5cf6);">A</div>
+          <div class="m-nameplate">🎙️ Alex (Lead)</div>
+        </div>
+        <div class="m-tile">
+          <div class="m-avatar" style="background:linear-gradient(135deg,#ec4899,#f43f5e);">P</div>
+          <div class="m-nameplate">🔇 Priya (QA)</div>
+        </div>
+        <div class="m-tile" id="tile-you">
+          <div class="m-avatar" style="background:linear-gradient(135deg,#06b6d4,#10b981);">D</div>
+          <div class="m-nameplate">🎙️ Devanshu (You)</div>
+        </div>
+        <div class="m-tile">
+          <div class="m-avatar" style="background:linear-gradient(135deg,#6366f1,#0ea5e9);">S</div>
+          <div class="m-nameplate">🔇 Sam (Infra)</div>
+        </div>
+      </div>
+      <div class="meeting-controls">
+        <span class="mc-btn">🎙️ Mute</span>
+        <span class="mc-btn">📹 Stop video</span>
+        <span class="mc-btn">⬆ Share</span>
+        <span class="mc-btn">⏺ Record</span>
+        <span class="mc-btn">•••</span>
+        <span class="mc-btn mc-end">✕</span>
       </div>
 
       <div class="reopen-bar" id="reopen-bar">
