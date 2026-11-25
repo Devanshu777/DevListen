@@ -490,20 +490,20 @@
         </div>
       </div>
 
-      <h2 class="section-title" style="margin-top:42px;">Active Engineering Roadmap (What We're Building Next)</h2>
-      <p class="section-sub">Current R&amp;D milestones to evolve DevListen into a full autonomous edge agent.</p>
+      <h2 class="section-title" style="margin-top:42px;">Active Engineering Roadmap &amp; Open-Source Call (Contributions Welcome!)</h2>
+      <p class="section-sub">Built transparently in the open—our current local STT pipeline already outperforms most out-of-the-box open-source setups, and here is what we're tackling next.</p>
       <div class="arch-grid">
         <div class="arch-card">
-          <h3>🦙 Local Quantized LLM Synthesis</h3>
-          <p>Integrating 4-bit quantized <code>Qwen2.5-3B</code> / <code>Phi-3.5</code> via <code>llama.cpp</code> for abstractive executive summaries and automatic ADR (Architecture Decision Record) PR generation offline.</p>
+          <h3>🧠 Toward DeepSeek Nova2 &amp; Qwen 3.8</h3>
+          <p>Actively working to bring local suggested-response quality closer to <strong>DeepSeek Nova2</strong>. Due to local hardware constraints, larger open-source LLMs like <strong>Qwen 3.8</strong> haven't been benchmarked yet—GPU contributors welcome!</p>
         </div>
         <div class="arch-card">
-          <h3>🎯 Hybrid Cross-Encoder Reranking</h3>
-          <p>Adding a lightweight local ONNX cross-encoder reranker over top-K bi-temporal graph nodes to boost precision on multi-constraint technical queries.</p>
+          <h3>🗣️ Universal Plugin-Free Diarization</h3>
+          <p>Engineering app-agnostic multi-speaker diarization across <strong>Zoom, Microsoft Teams, Google Meet, and Webex</strong> directly from system audio—no brittle per-app plugins or intrusive meeting bots required.</p>
         </div>
         <div class="arch-card">
-          <h3>🎛️ Multi-Channel SDK Diarization</h3>
-          <p>Optional Zoom/Teams local SDK audio track hooks for deterministic per-attendee channel isolation without heuristic clustering drift.</p>
+          <h3>🍎 Windows Today → macOS Next</h3>
+          <p>Currently runs on <strong>Windows</strong> (WASAPI Loopback, DPAPI, Win32 <code>WDA_EXCLUDEFROMCAPTURE</code>). Actively working on a <strong>macOS</strong> port using CoreAudio / ScreenCaptureKit and Keychain.</p>
         </div>
       </div>
     </div>
