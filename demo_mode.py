@@ -22,6 +22,7 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from vault.database import VaultDatabase
 from vault.temporal_graph import TemporalDecisionGraph
 from vault.semantic_search import SemanticSearchEngine
+from vault.context_formatter import format_context_html
 from ui.desktop_studio import DevListenStudio
 
 
@@ -31,40 +32,6 @@ class DemoSignaler(QObject):
     nudge = Signal(str, str)
     decision = Signal(dict)
     commitment = Signal(dict)
-
-
-def format_context_html(ctx: dict) -> str:
-    entity = ctx.get("entity", "Entity")
-    curr = ctx.get("current_decision")
-    history = ctx.get("history", [])
-
-    if not curr and not history:
-        return f"<div style='color: #ECEFF1; font-size: 11px;'>No recorded decisions found for <b>{entity}</b>.</div>"
-
-    html = "<div style='font-family: sans-serif; font-size: 11px;'>"
-    html += f"<div style='color: #818CF8; font-weight: bold; font-size: 12px; margin-bottom: 4px;'>{entity}</div>"
-
-    if curr:
-        html += f"""
-        <div style='color: #10B981; font-weight: bold; margin-bottom: 2px;'>
-            • CURRENT TRUTH [{curr['status']}]:
-        </div>
-        <div style='color: #ECEFF1; margin-left: 8px; margin-bottom: 6px;'>
-            {curr['summary']}
-        </div>
-        """
-
-    if history:
-        html += "<div style='color: #94A3B8; font-weight: bold; margin-top: 4px;'>• PRIOR HISTORY:</div>"
-        for h in history:
-            html += f"""
-            <div style='color: #64748B; font-size: 10px; margin-left: 8px;'>
-                <s>{h['summary']}</s> <span style='color: #EF4444;'>[SUPERSEDED]</span>
-            </div>
-            """
-
-    html += "</div>"
-    return html
 
 
 def get_mp3_duration_sec(mp3_path: str) -> float:

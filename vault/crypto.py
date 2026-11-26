@@ -4,22 +4,35 @@ Guarantees zero plaintext exposure on disk. All keys are derived from
 the Windows User credential envelope (CryptProtectData).
 """
 import os
+import sys
 import ctypes
-from ctypes import wintypes
 from cryptography.hazmat.primitives.ciphers.aead import AESGCM
 
-# Windows DPAPI structures
-class DATA_BLOB(ctypes.Structure):
-    _fields_ = [
-        ("cbData", wintypes.DWORD),
-        ("pbData", ctypes.POINTER(ctypes.c_byte))
-    ]
+if sys.platform == "win32":
+    from ctypes import wintypes
 
-_crypt32 = ctypes.windll.crypt32
-_kernel32 = ctypes.windll.kernel32
+    class DATA_BLOB(ctypes.Structure):
+        _fields_ = [
+            ("cbData", wintypes.DWORD),
+            ("pbData", ctypes.POINTER(ctypes.c_byte)),
+        ]
+
+    _crypt32 = ctypes.windll.crypt32
+    _kernel32 = ctypes.windll.kernel32
+else:
+    DATA_BLOB = None
+    _crypt32 = None
+    _kernel32 = None
+
+
+def _require_windows_dpapi():
+    if sys.platform != "win32" or _crypt32 is None or _kernel32 is None:
+        raise NotImplementedError("Windows DPAPI is only supported on win32 platforms.")
+
 
 def dpapi_protect(plaintext_bytes: bytes) -> bytes:
     """Encrypts bytes using Windows DPAPI tied to current user account."""
+    _require_windows_dpapi()
     in_blob = DATA_BLOB(len(plaintext_bytes), ctypes.cast(ctypes.create_string_buffer(plaintext_bytes), ctypes.POINTER(ctypes.c_byte)))
     out_blob = DATA_BLOB()
 
@@ -33,8 +46,10 @@ def dpapi_protect(plaintext_bytes: bytes) -> bytes:
     finally:
         _kernel32.LocalFree(out_blob.pbData)
 
+
 def dpapi_unprotect(ciphertext_bytes: bytes) -> bytes:
     """Decrypts bytes using Windows DPAPI tied to current user account."""
+    _require_windows_dpapi()
     in_blob = DATA_BLOB(len(ciphertext_bytes), ctypes.cast(ctypes.create_string_buffer(ciphertext_bytes), ctypes.POINTER(ctypes.c_byte)))
     out_blob = DATA_BLOB()
 

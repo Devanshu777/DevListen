@@ -83,7 +83,7 @@ class MeetingExporter:
                 status_icon = "🟢 [ACTIVE]" if d["status"] == "ACTIVE" else "🔴 [SUPERSEDED]" if d["status"] == "SUPERSEDED" else "⚪ [REJECTED]"
                 md.append(f"### {status_icon} **{d['entity_name']}**")
                 md.append(f"- **Summary:** {d['summary']}")
-                md.append(f"- **Proposed By:** {d.get('proposed_by', 'Team')} • **Status:** {d['status']}\n")
+                md.append(f"- **Proposed By:** {d['proposed_by'] or 'Team'} • **Status:** {d['status']}\n")
         else:
             md.append("*No formal decisions were recorded in this session.*\n")
 

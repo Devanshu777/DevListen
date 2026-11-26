@@ -4,7 +4,7 @@ Handles inserting decisions, superseding outdated decisions, and resolving
 context with chronological state decay so outdated decisions are never returned as current.
 """
 import uuid
-from datetime import datetime
+from datetime import datetime, timezone
 from typing import List, Dict, Any, Optional
 from vault.database import VaultDatabase
 
@@ -30,7 +30,7 @@ class TemporalDecisionGraph:
         one as SUPERSEDED with an exact timestamp link.
         """
         decision_id = str(uuid.uuid4())
-        now = datetime.utcnow().isoformat()
+        now = datetime.now(timezone.utc).replace(tzinfo=None).isoformat()
 
         with self.db.get_connection(read_only=False) as conn:
             # 1. Ensure entity exists

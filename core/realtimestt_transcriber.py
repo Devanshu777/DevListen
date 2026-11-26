@@ -22,48 +22,11 @@ except Exception:
     pass
 
 from RealtimeSTT import AudioToTextRecorder
+from core.dev_terms import DEV_TERMS_REPLACEMENTS
 
 # Empty prompt: No prompt conditioning.
 # Prevents Whisper from hallucinating prompt words when humming, laughing, or mumbling.
 DEFAULT_PROMPT = ""
-
-DEV_TERMS_REPLACEMENTS = [
-    (r'\b(?:they\s+want\s+you|the\s+van\s+shoe|the\s+want\s+you)\b', 'Devanshu'),
-    (r'\b(?:big\s+room)\b', 'Bikram'),
-    (r'\b(?:hip[\s-]*unkage|punk\s*edge)\b', 'Pankaj'),
-    (r'\b(?:zubria|subria)\b', 'Supriya'),
-    (r'\b(?:to\s+meet\s+you,?\s+)kitten\b', 'to meet you, Krishna'),
-    (r'\b(?:sunchip|sun\s*chip|sanjit|sonchit|highs\s+on\s+jit|pseintjet)\b', 'Sanchit'),
-    (r'\bplem\b', 'Prem'),
-    (r'\b(?:god\s+of\s+ganyu|got\s+of\s+ganyu|gaurav\s+filior)\b', 'Gaurav, can you'),
-    (r'\btraffic\b', 'Traefik'),
-    (r'\bkubernet(?:[,\s]*disk|\s*is|\s*es|\s*s)?\b', 'Kubernetes'),
-    (r'\benginex\b', 'NGINX'),
-    (r'\bengine,?\s+ingress\b', 'NGINX ingress'),
-    (r'\bpost[ -]?(?:qubonnet|hu?punates|gres(?:ql)?)\b', 'PostgreSQL'),
-    (r'\bwhere\'?s\s+esquil\b', 'PostgreSQL'),
-    (r'\bmongo[ -]?d[ -]?v\b', 'MongoDB'),
-    (r'\bcsed\b', 'CI/CD'),
-    (r'\bgraph[ -]?ql\b', 'GraphQL'),
-    (r'\bg\s*rpc\b', 'gRPC'),
-    (r'\bo\s*auth\s*2\b', 'OAuth2'),
-    (r'\bo\'?er\b', 'OAuth2'),
-    (r'\bjwt\b', 'JWT'),
-    (r'\bred\s+is\b', 'Redis'),
-    (r'\b(?:a\s+)?logan\s+failures?\b', 'login failures'),
-    (r'\ball\s+uiv\s+designs?\b', 'our UI redesign'),
-    (r'\b(?:screen-shit|screen\s+shit)\b', 'screen share them'),
-    (r'\bdevs\s+and\s+estes\b', 'devs and testers'),
-    (r'\bwiui\b', 'UI'),
-    (r'\bfull\s+of\s+sign\s+tasks\b', "we'll assign tasks"),
-    (r'\bsprinting\b', 'Sprint meeting'),
-    (r'\b(?:gwa|goaba|gwaba|guaba)\b', 'Guava'),
-    (r'\b(?:form|farm)\s+dependency\b', 'POM dependency'),
-    (r'\b(?:palm|pom)\s+dependency\b', 'POM dependency'),
-    (r'\bplaywright\b', 'Playwright'),
-    (r'\bospf\b', 'OSPF'),
-    (r'\bajax\b', 'AJAX'),
-]
 
 def sanitize_transcript(text: str) -> str:
     """
