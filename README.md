@@ -68,18 +68,11 @@ DevListen addresses three practical issues with typical meeting assistants:
 * **Interactive Browser Simulation:** [https://devanshu777.github.io/DevListen/](https://devanshu777.github.io/DevListen/)
 
 ### Desktop Application Screenshots (`demo_mode.py` / `main.py`)
+*(Click any screenshot to view full size)*
 
-**Live Capture & Dual-Stream Transcript**
-![Live Capture](docs/ss/Screenshot%202026-11-26%20202159.png)
-
-**Temporal Decisions & Action Items**
-![Decisions & Commitments](docs/ss/Screenshot%202026-11-26%20202229.png)
-
-**AI Workspace & Local Model Configuration**
-![AI Workspace](docs/ss/Screenshot%202026-11-26%20202224.png)
-
-**Session Library & Encrypted Vault**
-![Session Library](docs/ss/Screenshot%202026-11-26%20202210.png)
+| Live Capture | Temporal Decisions | AI Workspace | Session Library |
+| :---: | :---: | :---: | :---: |
+| <a href="docs/ss/Screenshot%202026-11-26%20202159.png"><img src="docs/ss/Screenshot%202026-11-26%20202159.png" width="200" alt="Live Capture" /></a> | <a href="docs/ss/Screenshot%202026-11-26%20202229.png"><img src="docs/ss/Screenshot%202026-11-26%20202229.png" width="200" alt="Temporal Decisions" /></a> | <a href="docs/ss/Screenshot%202026-11-26%20202224.png"><img src="docs/ss/Screenshot%202026-11-26%20202224.png" width="200" alt="AI Workspace" /></a> | <a href="docs/ss/Screenshot%202026-11-26%20202210.png"><img src="docs/ss/Screenshot%202026-11-26%20202210.png" width="200" alt="Session Library" /></a> |
 
 [![DevListen Desktop Studio Preview](docs/demo_preview.png)](https://devanshu777.github.io/DevListen/)
 
